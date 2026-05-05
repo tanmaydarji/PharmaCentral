@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCentral - Invoice View</title>
+    
+    <style>
+        /* તમારું બધું CSS એકદમ સરસ છે, કંઈ બદલવાની જરૂર નથી */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f4f7fc;
+            padding: 20px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 15px 15px 0 0;
+            margin-bottom: 0;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-area h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo-area p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .pharmacy-info {
+            text-align: right;
+        }
+
+        .invoice-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .invoice-container {
+            padding: 40px;
+        }
+
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #667eea;
+        }
+
+        .invoice-header h1 {
+            color: #667eea;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .invoice-header p {
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .invoice-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+
+        .detail-box h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .detail-box p {
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .customer-details {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+        }
+
+        .customer-details h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+
+        .items-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .items-table td {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .items-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .total-section {
+            text-align: right;
+            padding: 20px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: flex-end;
+            gap: 50px;
+            margin-bottom: 10px;
+        }
+
+        .grand-total {
+            font-size: 24px;
+            font-weight: 600;
+            color: #667eea;
+            border-top: 2px solid #667eea;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .payment-info {
+            text-align: center;
+            padding: 15px;
+            background: {% if sale.payment_status == 'paid' %}#00cc6620{% elif sale.due_amount > 0 %}#ff444420{% else %}#ffaa0020{% endif %};
+            border-radius: 10px;
+            margin-bottom: 30px;
+            color: {% if sale.payment_status == 'paid' %}#00cc66{% elif sale.due_amount > 0 %}#ff4444{% else %}#ffaa00{% endif %};
+            font-weight: 600;
+        }
+
+        .footer {
+            text-align: center;
+            color: #666;
+            padding-top: 20px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            padding: 20px 40px 40px 40px;
+            background: white;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-download {
+            background: #00cc66;
+            color: white;
+        }
+
+        .btn-back {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+        }
+
+        .btn-print:hover {
+            box-shadow: 0 8px 20px rgba(102,126,234,0.4);
+        }
+
+        .btn-download:hover {
+            box-shadow: 0 8px 20px rgba(0,204,102,0.4);
+        }
+
+        /* Message display for Django messages */
+        .messages {
+            max-width: 900px;
+            margin: 0 auto 20px auto;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideInMessage 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        @keyframes slideInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #ff4444;
+            border-left: 4px solid #ff4444;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            color: #00cc66;
+            border-left: 4px solid #00cc66;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #2196f3;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #856404;
+        }
+        
+        .close-alert {
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .close-alert:hover {
+            opacity: 1;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .payment-status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-paid {
+            background: #e8f5e9;
+            color: #00cc66;
+        }
+        .status-pending {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .status-due {
+            background: #fee;
+            color: #ff4444;
+        }
+
+        .amount-paid {
+            color: #00cc66;
+            font-weight: 600;
+        }
+        
+        .amount-due {
+            color: #ff4444;
+            font-weight: 600;
+        }
+
+        @media print {
+            .header, .action-buttons, .messages {
+                display: none !important;
+            }
+            
+            .invoice-wrapper {
+                box-shadow: none;
+            }
+            
+            body {
+                padding: 0;
+                background: white;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .invoice-details {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .total-row {
+                gap: 20px;
+            }
+            
+            .action-buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-area">
+            <h1>PharmaCentral</h1>
+            <p>Invoice #{{ sale.invoice_number }}</p>
+        </div>
+        <div class="pharmacy-info">
+            <h3>🏥 {{ pharmacy.name }}</h3>
+            <p id="currentDateTime">📅 Loading...</p>
+        </div>
+    </div>
+
+    <!-- Django Messages Display -->
+    {% if messages %}
+    <div class="messages">
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">
+            {{ message }}
+            <span class="close-alert" onclick="this.parentElement.style.display='none'">×</span>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="invoice-wrapper">
+        <div class="invoice-container" id="invoice">
+            <div class="invoice-header">
+    <h1>{{ pharmacy.name }}</h1>
+    <p>{{ pharmacy.address }}, {{ pharmacy.city }} - {{ pharmacy.pincode }}</p>
+    <p>Phone: {{ pharmacy.phone }} | GST: {{ pharmacy.gst_number }} | Email: {{ pharmacy.email }}</p>
+</div>
+
+            <div class="invoice-details">
+                <div class="detail-box">
+                    <h3>Invoice Number:</h3>
+                    <p><strong>{{ sale.invoice_number }}</strong></p>
+                    <p style="margin-top: 10px;">Date: {{ sale.date|date:"d/m/Y" }}</p>
+                    <p>Time: {{ sale.date|date:"h:i A" }}</p>
+                </div>
+                <div class="detail-box">
+                    <h3>Payment Details:</h3>
+                    <p>Method: {{ sale.get_payment_method_display }}</p>
+                    <span class="payment-status 
+                        {% if sale.payment_status == 'paid' %}status-paid
+                        {% elif sale.payment_status == 'pending' %}status-pending
+                        {% else %}status-due{% endif %}">
+                        {{ sale.get_payment_status_display }}
+                    </span>
+                    <p style="margin-top: 10px;">Bill No: {{ sale.id }}</p>
+                </div>
+            </div>
+
+            <div class="customer-details">
+                <h3>Customer Details:</h3>
+                <p><strong>Name:</strong> {{ sale.customer_name }}</p>
+                <p><strong>Phone:</strong> {{ sale.customer_phone }}</p>
+                {% if sale.customer %}
+                    <p><strong>Email:</strong> {{ sale.customer.email|default:"—" }}</p>
+                    <p><strong>Address:</strong> {{ sale.customer.address|default:"—" }}</p>
+                {% endif %}
+            </div>
+
+            <table class="items-table">
+                <thead>
+                    <tr>
+                        <th>Item Description</th>
+                        <th>Qty</th>
+                        <th>Unit Price</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in sale_items %}
+                    <tr>
+                        <td>{{ item.medicine_name }}</td>
+                        <td>{{ item.quantity }}</td>
+                        <td>₹{{ item.unit_price|floatformat:2 }}</td>
+                        <td>₹{{ item.total_price|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="total-section">
+                <div class="total-row">
+                    <span>Subtotal:</span>
+                    <span>₹{{ sale.subtotal|floatformat:2 }}</span>
+                </div>
+                <div class="total-row">
+                    <span>Discount:</span>
+                    <span>₹{{ sale.discount_amount|floatformat:2 }}</span>
+                </div>
+                <div class="total-row grand-total">
+                    <span>Grand Total:</span>
+                    <span>₹{{ sale.grand_total|floatformat:2 }}</span>
+                </div>
+                <div class="total-row">
+                    <span class="amount-paid">Amount Paid:</span>
+                    <span class="amount-paid">₹{{ sale.amount_paid|floatformat:2 }}</span>
+                </div>
+                <div class="total-row">
+                    <span class="amount-due">Due Amount:</span>
+                    <span class="amount-due">₹{{ sale.due_amount|floatformat:2 }}</span>
+                </div>
+            </div>
+
+            <div class="payment-info">
+                <p>✅ 
+                    {% if sale.payment_status == 'paid' %}
+                        Payment Received - Thank you for your purchase!<br>
+                        <span class="amount-paid">Paid: ₹{{ sale.amount_paid|floatformat:2 }}</span>
+                    {% elif sale.due_amount > 0 %}
+                        Partial Payment - Amount Due: ₹{{ sale.due_amount|floatformat:2 }}<br>
+                        <span class="amount-paid">Paid: ₹{{ sale.amount_paid|floatformat:2 }}</span> | 
+                        <span class="amount-due">Due: ₹{{ sale.due_amount|floatformat:2 }}</span>
+                    {% else %}
+                        Payment Pending - Amount Due: ₹{{ sale.grand_total|floatformat:2 }}
+                    {% endif %}
+                </p>
+            </div>
+
+            <div class="footer">
+                <p>*** This is a computer generated invoice ***</p>
+                <p>For any queries, please contact our customer support</p>
+                <p style="margin-top: 10px;">Returns accepted within 7 days with original packaging</p>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{% url 'sales_history' %}" class="btn btn-back">
+                <span>←</span> Back to History
+            </a>
+            <button class="btn btn-download" onclick="downloadInvoice()">
+                📥 Download
+            </button>
+            <button class="btn btn-print" onclick="window.print()">
+                🖨️ Print
+            </button>
+            <a href="{% url 'sales_edit' sale.id %}" class="btn btn-print" style="background: #764ba2;">
+                ✏️ Edit
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDateTime').innerHTML = '📅 ' + now.toLocaleString('en-IN', options);
+        }
+        
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Download invoice function
+        function downloadInvoice() {
+            const invoiceContent = document.getElementById('invoice').cloneNode(true);
+            const invoiceNo = "{{ sale.invoice_number }}";
+            
+            const printWindow = window.open('', '_blank');
+            
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Invoice ${invoiceNo} - PharmaCentral</title>
+                        <style>
+                            body { font-family: 'Segoe UI', Arial, sans-serif; padding: 40px; max-width: 900px; margin: 0 auto; background: white; }
+                            .invoice-header { text-align: center; margin-bottom: 40px; border-bottom: 2px dashed #667eea; padding-bottom: 20px; }
+                            .invoice-header h1 { color: #667eea; font-size: 36px; margin-bottom: 10px; }
+                            .invoice-details { display: flex; justify-content: space-between; background: #f8f9ff; padding: 20px; border-radius: 10px; margin-bottom: 30px; }
+                            .customer-details { background: #f8f9ff; padding: 20px; border-radius: 10px; margin-bottom: 30px; }
+                            .items-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+                            .items-table th { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px; text-align: left; }
+                            .items-table td { padding: 15px; border-bottom: 1px solid #f0f0f0; }
+                            .total-section { text-align: right; background: #f8f9ff; padding: 20px; border-radius: 10px; }
+                            .grand-total { font-size: 24px; color: #667eea; border-top: 2px solid #667eea; padding-top: 10px; margin-top: 10px; }
+                            .amount-paid { color: #00cc66; font-weight: 600; }
+                            .amount-due { color: #ff4444; font-weight: 600; }
+                            .payment-info { text-align: center; background: #00cc6620; padding: 15px; border-radius: 10px; color: #00cc66; margin: 30px 0; }
+                            .footer { text-align: center; color: #666; padding-top: 20px; border-top: 1px solid #f0f0f0; }
+                        </style>
+                    </head>
+                    <body>
+                        ${invoiceContent.outerHTML}
+                    </body>
+                </html>
+            `);
+            
+            printWindow.document.close();
+            alert('✅ Invoice ready for download!');
+        }
+
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+
+        // Keyboard shortcut for printing (Ctrl+P)
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p') {
+                e.preventDefault();
+                window.print();
+            }
+        });
+
+        console.log('Invoice page loaded successfully');
+    </script>
+</body>
+</html>

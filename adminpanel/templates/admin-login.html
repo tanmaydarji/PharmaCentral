@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCentral - Admin Login</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 32px;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .admin-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 20px;
+            border-radius: 25px;
+            display: inline-block;
+            margin-bottom: 30px;
+            font-size: 14px;
+            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .input-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+            transform: translateY(-2px);
+        }
+
+        .input-group input.error {
+            border-color: #ff4444;
+            animation: shake 0.3s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+        }
+
+        .login-btn.loading {
+            color: transparent;
+        }
+
+        .login-btn.loading::after {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: 50%;
+            left: 50%;
+            margin-left: -10px;
+            margin-top: -10px;
+            border: 3px solid #ffffff;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 13px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error-message.show {
+            display: block;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .message.success {
+            background: #e8f5e9;
+            color: #00cc66;
+            border-left: 4px solid #00cc66;
+        }
+
+        .message.error {
+            background: #fee;
+            color: #ff4444;
+            border-left: 4px solid #ff4444;
+        }
+
+        .message.warning {
+            background: #fff3cd;
+            color: #ffa500;
+            border-left: 4px solid #ffa500;
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            color: #999;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="logo">
+            <h1>PharmaCentral</h1>
+            <p>Admin Portal</p>
+        </div>
+
+        <div style="text-align: center;">
+            <span class="admin-badge">🔐 Super Admin Access</span>
+        </div>
+
+        <!-- Messages -->
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Login Form - FIXED URL -->
+        <form method="POST" action="{% url 'admin_login' %}">
+            {% csrf_token %}
+            
+            <div class="input-group">
+                <label>👤 Username</label>
+                <input type="text" name="username" id="username" placeholder="Enter username" required autofocus>
+                <div class="error-message" id="usernameError">Username is required</div>
+            </div>
+
+            <div class="input-group">
+                <label>🔒 Password</label>
+                <input type="password" name="password" id="password" placeholder="Enter password" required>
+                <div class="error-message" id="passwordError">Password is required</div>
+            </div>
+
+            <button type="submit" class="login-btn" id="loginBtn">
+                🔐 Login to Admin Panel
+            </button>
+        </form>
+
+    
+    </div>
+
+    <script>
+        const form = document.querySelector('form');
+        const username = document.getElementById('username');
+        const password = document.getElementById('password');
+        const loginBtn = document.getElementById('loginBtn');
+
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+
+            // Reset errors
+            document.getElementById('usernameError').classList.remove('show');
+            document.getElementById('passwordError').classList.remove('show');
+            username.classList.remove('error');
+            password.classList.remove('error');
+
+            // Validate username
+            if (!username.value.trim()) {
+                document.getElementById('usernameError').classList.add('show');
+                username.classList.add('error');
+                isValid = false;
+            }
+
+            // Validate password
+            if (!password.value.trim()) {
+                document.getElementById('passwordError').classList.add('show');
+                password.classList.add('error');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                return false;
+            }
+
+            // Show loading
+            loginBtn.classList.add('loading');
+            loginBtn.disabled = true;
+            return true;
+        });
+
+        // Remove errors on input
+        username.addEventListener('input', function() {
+            this.classList.remove('error');
+            document.getElementById('usernameError').classList.remove('show');
+        });
+
+        password.addEventListener('input', function() {
+            this.classList.remove('error');
+            document.getElementById('passwordError').classList.remove('show');
+        });
+    </script>
+</body>
+</html>

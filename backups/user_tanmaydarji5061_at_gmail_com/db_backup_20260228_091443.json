@@ -1,0 +1,18 @@
+{
+  "timestamp": "20260228_091443",
+  "date": "2026-02-28 09:14:43",
+  "user": {
+    "email": "tanmaydarji5061@gmail.com",
+    "username": "tanmaydarji5061@gmail.com",
+    "id": 7
+  },
+  "pharmacy": "Unknown",
+  "size": 339968,
+  "size_kb": "332.00 KB",
+  "tables": [
+    "medicines",
+    "customers",
+    "sales",
+    "pharmacy"
+  ]
+}

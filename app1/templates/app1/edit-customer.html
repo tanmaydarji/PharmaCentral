@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCentral - Edit Customer</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f4f7fc;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-area h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo-area p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .pharmacy-info {
+            text-align: right;
+        }
+
+        .pharmacy-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding: 30px 0;
+            animation: slideLeft 0.5s ease;
+        }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .profile-card {
+            text-align: center;
+            padding: 0 20px 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .profile-img {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 32px;
+        }
+
+        .profile-card h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .profile-card p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #666;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            color: #667eea;
+            padding-left: 35px;
+            border-left-color: #667eea;
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left-color: white;
+        }
+
+        .menu-item span {
+            font-size: 18px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            animation: slideRight 0.5s ease;
+        }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Message display for Django messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideInMessage 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        @keyframes slideInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #ff4444;
+            border-left: 4px solid #ff4444;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            color: #00cc66;
+            border-left: 4px solid #00cc66;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #2196f3;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #856404;
+        }
+        
+        .close-alert {
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .close-alert:hover {
+            opacity: 1;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-header h2 {
+            color: #333;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            max-width: 900px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group label i {
+            margin-right: 5px;
+            color: #667eea;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+            background: white;
+        }
+
+        .form-group input.error {
+            border-color: #ff4444;
+        }
+
+        .form-group .error-message {
+            color: #ff4444;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-group .error-message.show {
+            display: block;
+        }
+
+        .form-group input[readonly] {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-top: 5px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .radio-option input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #667eea;
+        }
+
+        .customer-type-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .type-regular { background: #e8f5e9; color: #00cc66; }
+        .type-vip { background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%); color: white; }
+        .type-debtor { background: #fee; color: #ff4444; }
+        .type-new { background: #e3f2fd; color: #2196f3; }
+
+        .form-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+            flex-wrap: wrap;
+        }
+
+        .btn-save {
+            padding: 12px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        }
+
+        .btn-save:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-cancel {
+            padding: 12px 30px;
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete {
+            padding: 12px 30px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-right: auto;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-delete:hover {
+            background: #ff6666;
+            transform: translateY(-2px);
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-right: 8px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Delete Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: white;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-icon {
+            font-size: 50px;
+            margin-bottom: 15px;
+        }
+
+        .modal-title {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .modal-text {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn-confirm {
+            background: #ff4444;
+            color: white;
+        }
+
+        .modal-btn-cancel {
+            background: #f0f0f0;
+            color: #666;
+        }
+
+        .modal-btn-confirm:hover {
+            background: #ff6666;
+            transform: translateY(-2px);
+        }
+
+        .modal-btn-cancel:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .quick-actions {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .action-btn.quick {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+            animation: pulse 2s infinite;
+            text-decoration: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102,126,234,0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(102,126,234,0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(102,126,234,0);
+            }
+        }
+
+        .action-btn.quick:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        @media (max-width: 768px) {
+            .form-actions {
+                flex-direction: column;
+            }
+            
+            .btn-delete {
+                margin-right: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-area">
+            <h1>PharmaCentral</h1>
+            <p>Edit Customer</p>
+        </div>
+        <div class="pharmacy-info">
+            <h3 id="pharmacyName">🏥 {{ pharmacy_name|default:"City Medical Store" }}</h3>
+            <p id="currentDateTime">📅 Loading...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="profile-card">
+                <div class="profile-img" id="profileInitials">{{ user_initials|default:"👨‍⚕️" }}</div>
+                <h3 id="userName">{{ user_full_name|default:"Dr. Rajesh Patel" }}</h3>
+                <p id="userRole">{{ user_role|default:"Owner / Pharmacist" }}</p>
+            </div>
+
+            <div class="menu">
+                <a href="{% url 'dashboard' %}" class="menu-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="{% url 'medicine_stock' %}" class="menu-item">
+                    <span>💊</span> Medicine Stock
+                </a>
+                <a href="{% url 'add_medicine' %}" class="menu-item">
+                    <span>➕</span> Add Medicine
+                </a>
+                <a href="{% url 'sales' %}" class="menu-item">
+                    <span>💰</span> New Sale
+                </a>
+                <a href="{% url 'sales_history' %}" class="menu-item">
+                    <span>📋</span> Sales History
+                </a>
+                <a href="{% url 'customers' %}" class="menu-item active">
+                    <span>👥</span> Customers
+                </a>
+                 <a href="{% url 'medicine_requests' %}" class="menu-item">📦 Medicine Requests</a>
+                <a href="{% url 'debtors' %}" class="menu-item">
+                    <span>📝</span> Debtors
+                </a>
+                <a href="{% url 'reports' %}" class="menu-item">
+                    <span>📈</span> Reports
+                </a>
+                <a href="{% url 'settings' %}" class="menu-item">
+                    <span>⚙️</span> Settings
+                </a>
+                <a href="{% url 'logout' %}" class="menu-item" onclick="return confirm('Are you sure you want to logout?')">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Django Messages Display -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <span class="close-alert" onclick="this.parentElement.style.display='none'">×</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="page-header">
+                <h2>
+                    <span>✏️</span> Edit Customer
+                </h2>
+                <a href="{% url 'view_customer' customer.id %}" class="btn-cancel">← Back to Profile</a>
+            </div>
+
+            <div class="form-container">
+                <form id="editCustomerForm" method="POST" action="{% url 'edit_customer' customer.id %}">
+                    {% csrf_token %}
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>🆔</i> Customer ID</label>
+                            <input type="text" value="{{ customer.customer_id|default:'CUST-2025-0123' }}" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label><i>📅</i> Customer Since</label>
+                            <input type="text" value="{{ customer.created_at|date:'d M Y'|default:'15 Mar 2025' }}" readonly>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>👤</i> First Name *</label>
+                            <input type="text" name="first_name" id="first_name" value="{{ customer.first_name|default:'Suresh' }}" required>
+                            <div class="error-message" id="error_first_name">First name is required</div>
+                        </div>
+                        <div class="form-group">
+                            <label><i>👤</i> Last Name *</label>
+                            <input type="text" name="last_name" id="last_name" value="{{ customer.last_name|default:'Sharma' }}" required>
+                            <div class="error-message" id="error_last_name">Last name is required</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>📞</i> Phone Number *</label>
+                            <input type="tel" name="phone" id="phone" value="{{ customer.phone|default:'9876543211' }}" required pattern="[0-9]{10}">
+                            <div class="error-message" id="error_phone">Valid 10-digit phone number is required</div>
+                        </div>
+                        <div class="form-group">
+                            <label><i>📧</i> Email Address</label>
+                            <input type="email" name="email" id="email" value="{{ customer.email|default:'suresh@email.com' }}">
+                            <div class="error-message" id="error_email">Valid email address is required</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>🎂</i> Date of Birth</label>
+                            <input type="date" name="date_of_birth" id="date_of_birth" value="{{ customer.date_of_birth|date:'Y-m-d'|default:'1985-06-15' }}">
+                        </div>
+                        <div class="form-group">
+                            <label><i>📍</i> City</label>
+                            <input type="text" name="city" id="city" value="{{ customer.city|default:'Ahmedabad' }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>🏠</i> Address</label>
+                            <textarea name="address" id="address" rows="3">{{ customer.address|default:'123, ABC Colony, Ahmedabad - 380015' }}</textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>🏷️</i> Customer Type</label>
+                            <div class="radio-group">
+                                <label class="radio-option">
+                                    <input type="radio" name="customer_type" value="regular" {% if customer.customer_type == 'regular' %}checked{% endif %}> 
+                                    <span class="customer-type-badge type-regular">Regular</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="customer_type" value="vip" {% if customer.customer_type == 'vip' %}checked{% endif %}> 
+                                    <span class="customer-type-badge type-vip">VIP</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="customer_type" value="debtor" {% if customer.customer_type == 'debtor' %}checked{% endif %}> 
+                                    <span class="customer-type-badge type-debtor">Debtor</span>
+                                </label>
+                                <label class="radio-option">
+                                    <input type="radio" name="customer_type" value="new" {% if customer.customer_type == 'new' %}checked{% endif %}> 
+                                    <span class="customer-type-badge type-new">New</span>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label><i>⚡</i> Status</label>
+                            <select name="status" id="status">
+                                <option value="active" {% if customer.status == 'active' %}selected{% endif %}>Active</option>
+                                <option value="inactive" {% if customer.status == 'inactive' %}selected{% endif %}>Inactive</option>
+                                <option value="blocked" {% if customer.status == 'blocked' %}selected{% endif %}>Blocked</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>📱</i> Emergency Contact</label>
+                            <input type="tel" name="emergency_contact" id="emergency_contact" value="{{ customer.emergency_contact|default:'9876543210' }}">
+                        </div>
+                        <div class="form-group">
+                            <label><i>🩸</i> Blood Group</label>
+                            <select name="blood_group" id="blood_group">
+                                <option value="">Select</option>
+                                <option value="A+" {% if customer.blood_group == 'A+' %}selected{% endif %}>A+</option>
+                                <option value="A-" {% if customer.blood_group == 'A-' %}selected{% endif %}>A-</option>
+                                <option value="B+" {% if customer.blood_group == 'B+' %}selected{% endif %}>B+</option>
+                                <option value="B-" {% if customer.blood_group == 'B-' %}selected{% endif %}>B-</option>
+                                <option value="O+" {% if customer.blood_group == 'O+' %}selected{% endif %}>O+</option>
+                                <option value="O-" {% if customer.blood_group == 'O-' %}selected{% endif %}>O-</option>
+                                <option value="AB+" {% if customer.blood_group == 'AB+' %}selected{% endif %}>AB+</option>
+                                <option value="AB-" {% if customer.blood_group == 'AB-' %}selected{% endif %}>AB-</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" class="btn-delete" onclick="showDeleteModal('{{ customer.id }}', '{{ customer.full_name|escapejs }}')">
+                            <span>🗑️</span> Delete
+                        </button>
+                        <a href="{% url 'view_customer' customer.id %}" class="btn-cancel">
+                            <span>❌</span> Cancel
+                        </a>
+                        <button type="submit" class="btn-save" id="saveBtn">
+                            <span id="btnText">💾 Save Changes</span>
+                            <span id="btnLoader" class="loader" style="display: none;"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-icon">🗑️</div>
+            <h3 class="modal-title">Delete Customer?</h3>
+            <p class="modal-text" id="deleteMessage">Are you sure you want to delete this customer?</p>
+            <div class="modal-buttons">
+                <form id="deleteForm" method="POST" action="">
+                    {% csrf_token %}
+                    <button type="submit" class="modal-btn modal-btn-confirm">Delete</button>
+                </form>
+                <button class="modal-btn modal-btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <a href="{% url 'add_customer' %}" class="action-btn quick" title="Add New Customer">➕</a>
+    </div>
+
+    <script>
+        // Get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDateTime').innerHTML = '📅 ' + now.toLocaleString('en-IN', options);
+        }
+        
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Form elements
+        const form = document.getElementById('editCustomerForm');
+        const saveBtn = document.getElementById('saveBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+
+        // Validation function
+        function validateField(input, errorId, condition) {
+            const errorDiv = document.getElementById(errorId);
+            if (!condition) {
+                input.classList.add('error');
+                errorDiv.classList.add('show');
+                return false;
+            } else {
+                input.classList.remove('error');
+                errorDiv.classList.remove('show');
+                return true;
+            }
+        }
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const firstName = document.getElementById('first_name').value.trim();
+            const lastName = document.getElementById('last_name').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const email = document.getElementById('email').value.trim();
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            // Phone validation
+            const phoneRegex = /^\d{10}$/;
+            
+            let isValid = true;
+            
+            isValid &= validateField(document.getElementById('first_name'), 'error_first_name', firstName.length > 0);
+            isValid &= validateField(document.getElementById('last_name'), 'error_last_name', lastName.length > 0);
+            isValid &= validateField(document.getElementById('phone'), 'error_phone', phoneRegex.test(phone));
+            
+            if (email && !emailRegex.test(email)) {
+                isValid &= validateField(document.getElementById('email'), 'error_email', false);
+            }
+            
+            if (isValid) {
+                btnText.innerHTML = '💾 Saving...';
+                btnLoader.style.display = 'inline-block';
+                saveBtn.disabled = true;
+                this.submit();
+            }
+        });
+
+        // Delete modal functions
+        function showDeleteModal(customerId, customerName) {
+            document.getElementById('deleteMessage').textContent = `Are you sure you want to delete "${customerName}"? This action cannot be undone.`;
+            document.getElementById('deleteForm').action = `/delete-customer/${customerId}/`;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('deleteModal');
+            if (event.target === modal) {
+                closeDeleteModal();
+            }
+        }
+
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+
+        // Real-time validation
+        document.getElementById('first_name').addEventListener('input', function() {
+            validateField(this, 'error_first_name', this.value.trim().length > 0);
+        });
+
+        document.getElementById('last_name').addEventListener('input', function() {
+            validateField(this, 'error_last_name', this.value.trim().length > 0);
+        });
+
+        document.getElementById('phone').addEventListener('input', function() {
+            const phoneRegex = /^\d{10}$/;
+            validateField(this, 'error_phone', phoneRegex.test(this.value.trim()));
+        });
+
+        document.getElementById('email').addEventListener('input', function() {
+            const email = this.value.trim();
+            if (email) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                validateField(this, 'error_email', emailRegex.test(email));
+            } else {
+                document.getElementById('error_email').classList.remove('show');
+                this.classList.remove('error');
+            }
+        });
+
+        console.log('Edit Customer page loaded');
+    </script>
+</body>
+</html>

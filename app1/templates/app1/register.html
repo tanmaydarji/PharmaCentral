@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCentral - Registration</title>
+    
+    <!-- Django CSRF Token -->
+    {% csrf_token %}
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 30px 20px;
+        }
+
+        .container {
+            max-width: 1300px;
+            width: 100%;
+            display: flex;
+            background: white;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.3);
+            animation: slideUp 1s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Left Side - Image & Animation */
+        .left-side {
+            flex: 1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 50px 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .floating-capsules {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+
+        .capsule {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            animation: floatCapsule 8s infinite;
+        }
+
+        @keyframes floatCapsule {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(10deg); }
+        }
+
+        .capsule:nth-child(1) {
+            width: 40px;
+            height: 80px;
+            top: 10%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .capsule:nth-child(2) {
+            width: 30px;
+            height: 60px;
+            top: 70%;
+            right: 15%;
+            animation-delay: 2s;
+        }
+
+        .capsule:nth-child(3) {
+            width: 50px;
+            height: 100px;
+            bottom: 15%;
+            left: 20%;
+            animation-delay: 4s;
+        }
+
+        .capsule:nth-child(4) {
+            width: 25px;
+            height: 45px;
+            top: 40%;
+            right: 25%;
+            animation-delay: 6s;
+        }
+
+        .pharmacy-icon {
+            width: 280px;
+            height: 280px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            animation: rotate 20s linear infinite;
+            position: relative;
+            z-index: 2;
+            border: 3px solid rgba(255,255,255,0.3);
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .pharmacy-icon svg {
+            width: 180px;
+            height: 180px;
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
+            animation: pulse 3s ease infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .left-side h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            text-align: center;
+            animation: fadeInRight 1s ease;
+            z-index: 2;
+        }
+
+        .left-side p {
+            text-align: center;
+            opacity: 0.9;
+            line-height: 1.8;
+            font-size: 16px;
+            animation: fadeInRight 1s ease 0.3s both;
+            z-index: 2;
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .features-list {
+            margin-top: 30px;
+            z-index: 2;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 15px 0;
+            animation: fadeInUp 1s ease;
+            background: rgba(255,255,255,0.1);
+            padding: 10px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+        }
+
+        .feature-item span {
+            font-size: 20px;
+        }
+
+        /* Message display for Django messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideInMessage 0.5s ease;
+        }
+        
+        @keyframes slideInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #ff4444;
+            border-left: 4px solid #ff4444;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            color: #00cc66;
+            border-left: 4px solid #00cc66;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #2196f3;
+            border-left: 4px solid #2196f3;
+        }
+
+        /* Right Side - Registration Form */
+        .right-side {
+            flex: 1.5;
+            padding: 50px 50px;
+            background: white;
+            max-height: 800px;
+            overflow-y: auto;
+            animation: slideInLeft 1s ease;
+        }
+
+        .right-side::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .right-side::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .right-side::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #333;
+            font-size: 36px;
+            margin-bottom: 5px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-text-fill-color: transparent;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 25px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+            display: inline-block;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            flex: 1;
+            margin-bottom: 20px;
+            animation: inputSlide 0.5s ease;
+        }
+
+        @keyframes inputSlide {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .form-group.full-width {
+            flex: 100%;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group label i {
+            margin-right: 8px;
+            color: #667eea;
+        }
+
+        .form-group input, 
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 5px rgba(102, 126, 234, 0.1);
+            transform: translateY(-3px);
+            background: white;
+        }
+
+        .form-group input.error {
+            border-color: #ff4444;
+        }
+
+        .form-group input:hover,
+        .form-group select:hover,
+        .form-group textarea:hover {
+            border-color: #764ba2;
+        }
+
+        .document-upload {
+            border: 2px dashed #667eea;
+            padding: 25px;
+            text-align: center;
+            border-radius: 12px;
+            background: #f8f9fa;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .document-upload:hover {
+            background: #e8f0fe;
+            border-color: #764ba2;
+            transform: scale(1.02);
+        }
+
+        .document-upload i {
+            font-size: 40px;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .document-upload p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .document-upload.active {
+            background: #e8f0fe;
+            border-color: #00cc66;
+        }
+
+        .file-name {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #00cc66;
+        }
+
+        .password-strength {
+            margin-top: 5px;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s ease;
+        }
+
+        .strength-bar.weak { background: #ff4444; width: 25%; }
+        .strength-bar.fair { background: #ffa500; width: 50%; }
+        .strength-bar.good { background: #667eea; width: 75%; }
+        .strength-bar.strong { background: #00cc66; width: 100%; }
+
+        .strength-text {
+            font-size: 12px;
+            margin-top: 5px;
+            text-align: right;
+        }
+
+        .strength-text.weak { color: #ff4444; }
+        .strength-text.fair { color: #ffa500; }
+        .strength-text.good { color: #667eea; }
+        .strength-text.strong { color: #00cc66; }
+
+        .terms {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 25px 0;
+        }
+
+        .terms input {
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        .terms label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .terms a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .btn-register {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .btn-register::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-register:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .btn-register:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-register:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .login-link {
+            text-align: center;
+            color: #666;
+            font-size: 15px;
+        }
+
+        .login-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .login-link a:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #333;
+            margin: 25px 0 15px;
+            padding-left: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .validation-error {
+            color: #ff4444;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .validation-error.show {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Side with Image and Features -->
+        <div class="left-side">
+            <div class="floating-capsules">
+                <div class="capsule"></div>
+                <div class="capsule"></div>
+                <div class="capsule"></div>
+                <div class="capsule"></div>
+            </div>
+            <div class="pharmacy-icon">
+                <svg viewBox="0 0 100 100" fill="white">
+                    <!-- Medical Cross with Pills -->
+                    <rect x="40" y="20" width="20" height="60" fill="white"/>
+                    <rect x="20" y="40" width="60" height="20" fill="white"/>
+                    <circle cx="30" cy="70" r="8" fill="white" opacity="0.8"/>
+                    <circle cx="70" cy="30" r="8" fill="white" opacity="0.8"/>
+                    <circle cx="70" cy="70" r="8" fill="white" opacity="0.8"/>
+                </svg>
+            </div>
+            <h2>Join PharmaCentral</h2>
+            <p>Complete your registration to start<br>managing your pharmacy efficiently</p>
+            
+            <div class="features-list">
+                <div class="feature-item">
+                    <span>💊</span> Real-time Inventory Tracking
+                </div>
+                <div class="feature-item">
+                    <span>⏰</span> Expiry Date Alerts
+                </div>
+                <div class="feature-item">
+                    <span>📊</span> Minimum Quantity Monitoring
+                </div>
+                <div class="feature-item">
+                    <span>👥</span> Customer & Debtor Management
+                </div>
+                <div class="feature-item">
+                    <span>📱</span> 24/7 Access & Support
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side with Registration Form -->
+        <div class="right-side">
+            <div class="logo">
+                <h1>PharmaCentral</h1>
+                <p>Create New Account</p>
+            </div>
+
+            <!-- Django Messages Display -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <form id="registerForm" method="POST" action="{% url 'register' %}" enctype="multipart/form-data">
+                <!-- CSRF Token - Required for Django security -->
+                {% csrf_token %}
+                
+                <h3 class="form-title">📋 Pharmacy Details</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>🏥 Pharmacy Name *</label>
+                        <input type="text" name="pharmacy_name" id="pharmacy_name" placeholder="Enter pharmacy name" required>
+                        <div class="validation-error" id="error_pharmacy_name">Pharmacy name is required</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>👨‍⚕️ Owner Name *</label>
+                        <input type="text" name="owner_name" id="owner_name" placeholder="Enter owner name" required>
+                        <div class="validation-error" id="error_owner_name">Owner name is required</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>📞 Contact Number *</label>
+                        <input type="tel" name="contact" id="contact" placeholder="Enter contact number" required pattern="[0-9]{10}">
+                        <div class="validation-error" id="error_contact">Valid 10-digit phone number required</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>📧 Email Address *</label>
+                        <input type="email" name="email" id="email" placeholder="Enter email address" required>
+                        <div class="validation-error" id="error_email">Valid email address required</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>📍 City *</label>
+                        <input type="text" name="city" id="city" placeholder="Enter city" required>
+                        <div class="validation-error" id="error_city">City is required</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>📮 Pincode *</label>
+                        <input type="text" name="pincode" id="pincode" placeholder="Enter pincode" required pattern="[0-9]{6}">
+                        <div class="validation-error" id="error_pincode">Valid 6-digit pincode required</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>🔢 GST Number *</label>
+                        <input type="text" name="gst_number" id="gst_number" placeholder="Enter GST number" required>
+                        <div class="validation-error" id="error_gst">GST number is required</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>📱 Pharmacy License No. *</label>
+                        <input type="text" name="license_number" id="license_number" placeholder="Enter license number" required>
+                        <div class="validation-error" id="error_license">License number is required</div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group full-width">
+                        <label>🏢 Address *</label>
+                        <textarea name="address" id="address" placeholder="Enter full address" required></textarea>
+                        <div class="validation-error" id="error_address">Address is required</div>
+                    </div>
+                </div>
+
+                <h3 class="section-title">📎 Documents Upload</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>🪪 GST Certificate *</label>
+                        <div class="document-upload" id="gst_upload" onclick="document.getElementById('gst_file').click()">
+                            <div>📄</div>
+                            <p>Click to upload GST Certificate</p>
+                            <input type="file" name="gst_certificate" id="gst_file" style="display: none;" accept=".pdf,.jpg,.jpeg,.png" required>
+                        </div>
+                        <div class="file-name" id="gst_filename"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>📋 Pharmacy License *</label>
+                        <div class="document-upload" id="license_upload" onclick="document.getElementById('license_file').click()">
+                            <div>📑</div>
+                            <p>Click to upload License</p>
+                            <input type="file" name="license_document" id="license_file" style="display: none;" accept=".pdf,.jpg,.jpeg,.png" required>
+                        </div>
+                        <div class="file-name" id="license_filename"></div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>🆔 ID Proof (Owner) *</label>
+                        <div class="document-upload" id="idproof_upload" onclick="document.getElementById('idproof_file').click()">
+                            <div>🪪</div>
+                            <p>Click to upload ID Proof</p>
+                            <input type="file" name="id_proof" id="idproof_file" style="display: none;" accept=".pdf,.jpg,.jpeg,.png" required>
+                        </div>
+                        <div class="file-name" id="idproof_filename"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>📸 Passport Size Photo *</label>
+                        <div class="document-upload" id="photo_upload" onclick="document.getElementById('photo_file').click()">
+                            <div>📷</div>
+                            <p>Click to upload Photo</p>
+                            <input type="file" name="owner_photo" id="photo_file" style="display: none;" accept=".jpg,.jpeg,.png" required>
+                        </div>
+                        <div class="file-name" id="photo_filename"></div>
+                    </div>
+                </div>
+
+                <h3 class="section-title">🔐 Account Security</h3>
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>🔒 Password *</label>
+                        <input type="password" name="password" id="password" placeholder="Create password" required minlength="8">
+                        <div class="password-strength">
+                            <div class="strength-bar" id="strengthBar"></div>
+                        </div>
+                        <div class="strength-text" id="strengthText"></div>
+                        <div class="validation-error" id="error_password">Password must be at least 8 characters</div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🔒 Confirm Password *</label>
+                        <input type="password" name="confirm_password" id="confirm_password" placeholder="Confirm password" required>
+                        <div class="validation-error" id="error_confirm">Passwords do not match</div>
+                    </div>
+                </div>
+
+                <div class="terms">
+                    <input type="checkbox" name="terms" id="terms" required>
+                    <label for="terms">I agree to the <a href="#" onclick="alert('Terms and Conditions will be shown here'); return false;">Terms & Conditions</a> and <a href="#" onclick="alert('Privacy Policy will be shown here'); return false;">Privacy Policy</a></label>
+                </div>
+
+                <button type="submit" class="btn-register" id="registerBtn">
+                    <span id="btnText">Create Account & Continue</span>
+                    <span id="btnLoader" class="loader" style="display: none;"></span>
+                </button>
+
+                <div class="login-link">
+                    Already have an account? <a href="{% url 'login' %}">Login Here</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Get elements
+        const registerForm = document.getElementById('registerForm');
+        const registerBtn = document.getElementById('registerBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+        
+        // Password strength checker
+        const passwordInput = document.getElementById('password');
+        const confirmInput = document.getElementById('confirm_password');
+        const strengthBar = document.getElementById('strengthBar');
+        const strengthText = document.getElementById('strengthText');
+
+        // File upload handlers
+        function setupFileUpload(inputId, uploadDivId, filenameSpanId) {
+            const input = document.getElementById(inputId);
+            const uploadDiv = document.getElementById(uploadDivId);
+            const filenameSpan = document.getElementById(filenameSpanId);
+            
+            input.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    filenameSpan.textContent = '📎 ' + this.files[0].name;
+                    uploadDiv.classList.add('active');
+                } else {
+                    filenameSpan.textContent = '';
+                    uploadDiv.classList.remove('active');
+                }
+            });
+        }
+
+        // Setup all file uploads
+        setupFileUpload('gst_file', 'gst_upload', 'gst_filename');
+        setupFileUpload('license_file', 'license_upload', 'license_filename');
+        setupFileUpload('idproof_file', 'idproof_upload', 'idproof_filename');
+        setupFileUpload('photo_file', 'photo_upload', 'photo_filename');
+
+        // Password strength checker
+        passwordInput.addEventListener('input', function() {
+            const password = this.value;
+            let strength = 0;
+            
+            if (password.length >= 8) strength += 25;
+            if (password.match(/[a-z]+/)) strength += 25;
+            if (password.match(/[A-Z]+/)) strength += 25;
+            if (password.match(/[0-9]+/)) strength += 25;
+            if (password.match(/[$@#&!]+/)) strength += 25;
+            
+            strength = Math.min(strength, 100);
+            
+            // Update strength bar
+            if (strength < 25) {
+                strengthBar.className = 'strength-bar weak';
+                strengthText.textContent = 'Weak';
+                strengthText.className = 'strength-text weak';
+            } else if (strength < 50) {
+                strengthBar.className = 'strength-bar fair';
+                strengthText.textContent = 'Fair';
+                strengthText.className = 'strength-text fair';
+            } else if (strength < 75) {
+                strengthBar.className = 'strength-bar good';
+                strengthText.textContent = 'Good';
+                strengthText.className = 'strength-text good';
+            } else {
+                strengthBar.className = 'strength-bar strong';
+                strengthText.textContent = 'Strong';
+                strengthText.className = 'strength-text strong';
+            }
+        });
+
+        // Validation functions
+        function validateField(input, errorId, condition) {
+            const errorDiv = document.getElementById(errorId);
+            if (!condition) {
+                input.classList.add('error');
+                errorDiv.classList.add('show');
+                return false;
+            } else {
+                input.classList.remove('error');
+                errorDiv.classList.remove('show');
+                return true;
+            }
+        }
+
+        // Form submission
+        registerForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get values
+            const pharmacyName = document.getElementById('pharmacy_name').value.trim();
+            const ownerName = document.getElementById('owner_name').value.trim();
+            const contact = document.getElementById('contact').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const pincode = document.getElementById('pincode').value.trim();
+            const gst = document.getElementById('gst_number').value.trim();
+            const license = document.getElementById('license_number').value.trim();
+            const address = document.getElementById('address').value.trim();
+            const password = passwordInput.value;
+            const confirm = confirmInput.value;
+            const terms = document.getElementById('terms').checked;
+            
+            // Email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            
+            // Phone validation
+            const phoneRegex = /^\d{10}$/;
+            
+            // Pincode validation
+            const pincodeRegex = /^\d{6}$/;
+            
+            // Validate all fields
+            let isValid = true;
+            
+            isValid &= validateField(document.getElementById('pharmacy_name'), 'error_pharmacy_name', pharmacyName.length > 0);
+            isValid &= validateField(document.getElementById('owner_name'), 'error_owner_name', ownerName.length > 0);
+            isValid &= validateField(document.getElementById('contact'), 'error_contact', phoneRegex.test(contact));
+            isValid &= validateField(document.getElementById('email'), 'error_email', emailRegex.test(email));
+            isValid &= validateField(document.getElementById('city'), 'error_city', city.length > 0);
+            isValid &= validateField(document.getElementById('pincode'), 'error_pincode', pincodeRegex.test(pincode));
+            isValid &= validateField(document.getElementById('gst_number'), 'error_gst', gst.length > 0);
+            isValid &= validateField(document.getElementById('license_number'), 'error_license', license.length > 0);
+            isValid &= validateField(document.getElementById('address'), 'error_address', address.length > 0);
+            
+            // Password validation
+            if (password.length < 8) {
+                validateField(passwordInput, 'error_password', false);
+                isValid = false;
+            } else {
+                validateField(passwordInput, 'error_password', true);
+            }
+            
+            // Confirm password validation
+            if (password !== confirm) {
+                validateField(confirmInput, 'error_confirm', false);
+                isValid = false;
+            } else {
+                validateField(confirmInput, 'error_confirm', true);
+            }
+            
+            // Terms validation
+            if (!terms) {
+                alert('Please agree to Terms & Conditions');
+                isValid = false;
+            }
+            
+            // Check file uploads
+            if (!document.getElementById('gst_file').files.length) {
+                alert('Please upload GST Certificate');
+                isValid = false;
+            }
+            
+            if (!document.getElementById('license_file').files.length) {
+                alert('Please upload Pharmacy License');
+                isValid = false;
+            }
+            
+            if (!document.getElementById('idproof_file').files.length) {
+                alert('Please upload ID Proof');
+                isValid = false;
+            }
+            
+            if (!document.getElementById('photo_file').files.length) {
+                alert('Please upload Photo');
+                isValid = false;
+            }
+            
+            if (isValid) {
+                // Show loading animation
+                btnText.textContent = 'Creating Account...';
+                btnLoader.style.display = 'inline-block';
+                registerBtn.disabled = true;
+                
+                // Submit the form
+                this.submit();
+            }
+        });
+
+        // Add animation to inputs
+        const inputs = document.querySelectorAll('.form-group input, .form-group select, .form-group textarea');
+        inputs.forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'scale(1.02)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'scale(1)';
+            });
+        });
+    </script>
+</body>
+</html>

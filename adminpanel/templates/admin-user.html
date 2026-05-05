@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCentral - All Pharmacies</title>
+    
+    <!-- SweetAlert2 CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f4f7fc;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 15px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-area h1 {
+            font-size: 24px;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .admin-badge {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .date-time {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 15px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 70px);
+            animation: slideLeft 0.5s ease;
+        }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .sidebar {
+            width: 250px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding: 20px 0;
+        }
+
+        .profile-card {
+            text-align: center;
+            padding: 0 20px 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .profile-img {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102,126,234,0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(102,126,234,0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(102,126,234,0);
+            }
+        }
+
+        .profile-card h3 {
+            font-size: 16px;
+            color: #333;
+        }
+
+        .profile-card p {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #666;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            color: #667eea;
+            padding-left: 25px;
+            border-left-color: #667eea;
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left-color: white;
+        }
+
+        .menu-item span {
+            font-size: 18px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            animation: slideRight 0.5s ease;
+        }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-header h2 {
+            color: #333;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .search-box {
+            width: 300px;
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: 12px center;
+            background-size: 16px;
+            padding-left: 40px;
+        }
+
+        .search-box:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102,126,234,0.1);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23667eea' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='11' cy='11' r='8'%3E%3C/circle%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'%3E%3C/line%3E%3C/svg%3E");
+        }
+
+        .pharmacy-table {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1100px;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px 10px;
+            color: #666;
+            font-weight: 600;
+            border-bottom: 2px solid #f0f0f0;
+            background: #f8f9fa;
+        }
+
+        td {
+            padding: 15px 10px;
+            border-bottom: 1px solid #f0f0f0;
+            color: #666;
+        }
+
+        tr:hover td {
+            background: #f8f9fa;
+        }
+
+        .pharmacy-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pharmacy-icon {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .pharmacy-details h4 {
+            color: #333;
+            font-size: 15px;
+            margin-bottom: 3px;
+        }
+
+        .pharmacy-details small {
+            color: #999;
+            font-size: 11px;
+        }
+
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-active {
+            background: #e8f5e9;
+            color: #00cc66;
+        }
+
+        .status-inactive {
+            background: #fee;
+            color: #ff4444;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 5px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn.delete {
+            background: #ff475720;
+            color: #ff4757;
+        }
+
+        .action-btn.delete:hover {
+            background: #ff4757;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .pagination a, .pagination span {
+            padding: 8px 15px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .pagination .active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            color: #00cc66;
+            border-left: 4px solid #00cc66;
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #ff4444;
+            border-left: 4px solid #ff4444;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #2196f3;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .close-alert {
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .close-alert:hover {
+            opacity: 1;
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+            font-style: italic;
+        }
+
+        .quick-actions {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .action-btn.quick {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+            animation: pulse 2s infinite;
+            text-decoration: none;
+        }
+
+        .action-btn.quick:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-area">
+            <h1>PharmaCentral</h1>
+        </div>
+        <div class="admin-info">
+            <div class="admin-badge">
+                <span>👑</span> {{ user.get_full_name|default:user.username }}
+            </div>
+            <div class="date-time" id="currentDateTime"></div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="profile-card">
+                <div class="profile-img">👑</div>
+                <h3>{{ user.get_full_name|default:user.username }}</h3>
+                <p>Super Admin</p>
+                <p style="font-size: 12px; color: #999;">{{ user.email }}</p>
+            </div>
+
+            <div class="menu">
+                <a href="{% url 'admin_dashboard' %}" class="menu-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="{% url 'admin_users' %}" class="menu-item active">
+                    <span>👥</span> All Pharmacies
+                </a>
+                <a href="{% url 'admin_logout' %}" class="menu-item" onclick="return confirm('Are you sure you want to logout?')">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Messages -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <span class="close-alert" onclick="this.parentElement.style.display='none'">×</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="page-header">
+                <h2>
+                    <span>👥</span> All Pharmacies
+                </h2>
+                <input type="text" class="search-box" id="searchInput" placeholder="🔍 Search pharmacies..." value="{{ search_query }}">
+            </div>
+
+            <div class="pharmacy-table">
+                <table id="pharmacyTable">
+                    <thead>
+                        <tr>
+                            <th>Pharmacy</th>
+                            <th>Owner</th>
+                            <th>License No.</th>
+                            <th>GST No.</th>
+                            <th>City</th>
+                            <th>Phone</th>
+                            <th>Email</th>
+                            <th>Join Date</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr id="row-{{ user.id }}">
+                            <td>
+                                <div class="pharmacy-info">
+                                    <div class="pharmacy-icon">🏥</div>
+                                    <div class="pharmacy-details">
+                                        <h4>{{ user.pharmacy.name|default:"No Pharmacy" }}</h4>
+                                        <small>ID: {{ user.id }}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ user.get_full_name|default:user.username }}</td>
+                            <td>{{ user.pharmacy.license_number|default:"—" }}</td>
+                            <td>{{ user.pharmacy.gst_number|default:"—" }}</td>
+                            <td>{{ user.pharmacy.city|default:"—" }}</td>
+                            <td>{{ user.pharmacy.phone|default:"—" }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>{{ user.date_joined|date:"d M Y" }}</td>
+                            <td>
+                                <span class="status-badge {% if user.is_active %}status-active{% else %}status-inactive{% endif %}">
+                                    {% if user.is_active %}Active{% else %}Inactive{% endif %}
+                                </span>
+                            </td>
+                            <td>
+    <div class="action-buttons">
+        <button class="action-btn delete" onclick="deletePharmacy('{{ user.id }}', '{{ user.pharmacy.name|default:user.username }}')">
+            🗑️ Delete
+        </button>
+    </div>
+</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="10" class="no-data">
+                                <div style="text-align: center; padding: 40px;">
+                                    <div style="font-size: 48px; margin-bottom: 20px;">👥</div>
+                                    <h3 style="color: #333; margin-bottom: 10px;">No Pharmacies Found</h3>
+                                    <p style="color: #666;">{% if search_query %}No pharmacies matching "{{ search_query }}"{% else %}No pharmacies registered yet{% endif %}</p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                {% if users.has_other_pages %}
+                <div class="pagination">
+                    {% if users.has_previous %}
+                        <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">«</a>
+                        <a href="?page={{ users.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">‹</a>
+                    {% endif %}
+
+                    {% for i in users.paginator.page_range %}
+                        {% if users.number == i %}
+                            <span class="active">{{ i }}</span>
+                        {% elif i > users.number|add:'-3' and i < users.number|add:'3' %}
+                            <a href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ i }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if users.has_next %}
+                        <a href="?page={{ users.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">›</a>
+                        <a href="?page={{ users.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">»</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="{% url 'admin_dashboard' %}" class="action-btn quick" title="Back to Dashboard">📊</a>
+    </div>
+
+
+
+
+<script>
+// ============================================
+// CSRF TOKEN
+// ============================================
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
+console.log('🔑 CSRF Token:', csrftoken ? '✓ Loaded' : '✗ Not Found');
+
+// ============================================
+// DATE & TIME
+// ============================================
+function updateDateTime() {
+    const now = new Date();
+    const options = { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit',
+        day: 'numeric', 
+        month: 'short',
+        year: 'numeric',
+        timeZone: 'Asia/Kolkata'
+    };
+    const dateElement = document.getElementById('currentDateTime');
+    if (dateElement) {
+        dateElement.innerHTML = now.toLocaleString('en-IN', options);
+    }
+}
+updateDateTime();
+setInterval(updateDateTime, 1000);
+
+// ============================================
+// AUTO SEARCH
+// ============================================
+let searchTimeout;
+const searchInput = document.getElementById('searchInput');
+
+if (searchInput) {
+    searchInput.addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('#pharmacyTable tbody tr');
+            let visibleCount = 0;
+            
+            rows.forEach(row => {
+                if (row.classList.contains('no-data-row')) return;
+                
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm) || searchTerm === '') {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+            
+            console.log(`🔍 Search: "${searchTerm}" - ${visibleCount} results`);
+        }, 300);
+    });
+}
+
+// ============================================
+// DELETE PHARMACY FUNCTION
+// ============================================
+function deletePharmacy(userId, pharmacyName) {
+    console.log('🗑️ Delete clicked - ID:', userId, 'Name:', pharmacyName);
+    
+    // SweetAlert confirmation
+    Swal.fire({
+        title: 'Delete Pharmacy?',
+        html: `Are you sure you want to delete <strong>${pharmacyName}</strong>?<br><br>` +
+              `This will permanently delete:<br>` +
+              `• User account<br>` +
+              `• Pharmacy details<br>` +
+              `• All medicines<br>` +
+              `• All customers<br>` +
+              `• All sales records<br>` +
+              `• All debtor information<br><br>` +
+              `<span style="color: #ff4444;">This action cannot be undone!</span>`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ff4444',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: 'Yes, delete it!',
+        cancelButtonText: 'Cancel',
+        background: 'white',
+        backdrop: 'rgba(0,0,0,0.5)'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Show loading
+            Swal.fire({
+                title: 'Deleting...',
+                html: 'Please wait while we delete the data.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
+            });
+            
+            // Make AJAX request
+            fetch(`/admin-panel/delete-pharmacy/${userId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrftoken,
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                console.log('📥 Response status:', response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log('📦 Response data:', data);
+                
+                if (data.success) {
+                    // Remove row
+                    const row = document.getElementById(`row-${userId}`);
+                    if (row) {
+                        row.remove();
+                    }
+                    
+                    // Show success
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: data.message || 'Pharmacy deleted successfully!',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                } else {
+                    // Show error
+                    Swal.fire({
+                        title: 'Error!',
+                        text: data.error || 'Failed to delete pharmacy',
+                        icon: 'error'
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('❌ Error:', error);
+                Swal.fire({
+                    title: 'Error!',
+                    text: 'Network error occurred',
+                    icon: 'error'
+                });
+            });
+        }
+    });
+}
+
+// ============================================
+// AUTO-HIDE MESSAGES
+// ============================================
+setTimeout(function() {
+    document.querySelectorAll('.alert').forEach(function(alert) {
+        alert.style.transition = 'opacity 0.5s ease';
+        alert.style.opacity = '0';
+        setTimeout(() => alert.style.display = 'none', 500);
+    });
+}, 5000);
+
+// ============================================
+// TABLE ROW ANIMATIONS
+// ============================================
+document.querySelectorAll('tbody tr').forEach((row, index) => {
+    if (!row.classList.contains('no-data-row')) {
+        row.style.animation = `fadeInRow 0.3s ease ${index * 0.05}s both`;
+    }
+});
+
+// ============================================
+// CUSTOM STYLES
+// ============================================
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes fadeInRow {
+        from {
+            opacity: 0;
+            transform: translateX(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+`;
+document.head.appendChild(style);
+
+// ============================================
+// CONSOLE LOG
+// ============================================
+console.log('✅ Admin Users page loaded successfully');
+</script>
+</body>
+</html>

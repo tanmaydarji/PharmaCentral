@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCentral - Add Medicine</title>
+    
+    <!-- Django CSRF Token -->
+    {% csrf_token %}
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f4f7fc;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-area h1 {
+            font-size: 28px;
+        }
+
+        .logo-area p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .pharmacy-info {
+            text-align: right;
+        }
+
+        .pharmacy-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .pharmacy-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding: 30px 0;
+            animation: slideLeft 0.5s ease;
+        }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .profile-card {
+            text-align: center;
+            padding: 0 20px 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .profile-img {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 32px;
+        }
+
+        .profile-card h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .profile-card p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            color: #667eea;
+            padding-left: 35px;
+            border-left-color: #667eea;
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left-color: white;
+        }
+
+        .menu-item span {
+            font-size: 18px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            animation: slideRight 0.5s ease;
+        }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .page-header {
+            margin-bottom: 30px;
+        }
+
+        .page-header h2 {
+            color: #333;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-header p {
+            color: #666;
+            font-size: 15px;
+            margin-top: 5px;
+        }
+
+        /* Message display for Django messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideInMessage 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        @keyframes slideInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #ff4444;
+            border-left: 4px solid #ff4444;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            color: #00cc66;
+            border-left: 4px solid #00cc66;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #2196f3;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #856404;
+        }
+        
+        .close-alert {
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .close-alert:hover {
+            opacity: 1;
+        }
+
+        .form-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            max-width: 900px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group label i {
+            margin-right: 5px;
+            color: #667eea;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+            outline: none;
+            background: white;
+            transform: translateY(-2px);
+        }
+
+        .form-group input.error {
+            border-color: #ff4444;
+        }
+
+        .form-group .error-message {
+            color: #ff4444;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .form-group .error-message.show {
+            display: block;
+        }
+
+        .form-group small {
+            color: #999;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+
+        .btn-submit {
+            padding: 14px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-cancel {
+            padding: 14px 30px;
+            background: #f0f0f0;
+            color: #666;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-left: 15px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-cancel:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 30px;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #ffffff;
+            border-radius: 50%;
+            border-top-color: transparent;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .quick-actions {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .form-actions {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn-cancel {
+                margin-left: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-area">
+            <h1>PharmaCentral</h1>
+            <p>Add New Medicine</p>
+        </div>
+        <div class="pharmacy-info">
+            <h3 id="pharmacyName">🏥 {{ pharmacy_name|default:"City Medical Store" }}</h3>
+            <p id="currentDateTime">📅 Loading...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="profile-card">
+                <div class="profile-img" id="profileInitials">{{ user_initials|default:"👨‍⚕️" }}</div>
+                <h3 id="userName">{{ user_full_name|default:"Dr. Rajesh Patel" }}</h3>
+                <p id="userRole">{{ user_role|default:"Owner / Pharmacist" }}</p>
+            </div>
+
+            <div class="menu">
+                <a href="{% url 'dashboard' %}" class="menu-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="{% url 'medicine_stock' %}" class="menu-item">
+                    <span>💊</span> Medicine Stock
+                </a>
+                <a href="{% url 'add_medicine' %}" class="menu-item active">
+                    <span>➕</span> Add Medicine
+                </a>
+                <a href="{% url 'sales' %}" class="menu-item">
+                    <span>💰</span> New Sale
+                </a>
+                <a href="{% url 'sales_history' %}" class="menu-item">
+                    <span>📋</span> Sales History
+                </a>
+                <a href="{% url 'customers' %}" class="menu-item">
+                    <span>👥</span> Customers
+                </a>
+                <a href="{% url 'medicine_requests' %}" class="menu-item">📦 Medicine Requests</a>
+                <a href="{% url 'debtors' %}" class="menu-item">
+                    <span>📝</span> Debtors
+                </a>
+                <a href="{% url 'reports' %}" class="menu-item">
+                    <span>📈</span> Reports
+                </a>
+                <a href="{% url 'settings' %}" class="menu-item">
+                    <span>⚙️</span> Settings
+                </a>
+                <a href="{% url 'logout' %}" class="menu-item" onclick="return confirm('Are you sure you want to logout?')">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="page-header">
+                <h2>
+                    <span>➕</span> Add New Medicine
+                </h2>
+                <p>Enter medicine details to add to inventory</p>
+            </div>
+
+            <!-- Django Messages Display -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <span class="close-alert" onclick="this.parentElement.style.display='none'">×</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="form-container">
+                <form id="addMedicineForm" method="POST" action="{% url 'add_medicine' %}">
+                    <!-- CSRF Token - Required for Django security -->
+                    {% csrf_token %}
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>💊</i> Medicine Name *</label>
+                            <input type="text" name="name" id="name" placeholder="Enter medicine name" required>
+                            <div class="error-message" id="error_name">Medicine name is required</div>
+                        </div>
+                        <div class="form-group">
+                            <label><i>🔢</i> Medicine Code *</label>
+                            <input type="text" name="medicine_code" id="medicine_code" placeholder="Enter medicine code" required>
+                            <div class="error-message" id="error_code">Medicine code is required</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>🏷️</i> Category *</label>
+                            <select name="category" id="category" required>
+                                <option value="">Select Category</option>
+                                {% if categories %}
+                                    {% for category in categories %}
+                                    <option value="{{ category.id }}">{{ category.name }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="1">Pain Killer</option>
+                                    <option value="2">Antibiotic</option>
+                                    <option value="3">Antihistamine</option>
+                                    <option value="4">Gastric</option>
+                                    <option value="5">Diabetes</option>
+                                    <option value="6">Blood Pressure</option>
+                                    <option value="7">Other</option>
+                                {% endif %}
+                            </select>
+                            <div class="error-message" id="error_category">Please select a category</div>
+                        </div>
+                        <div class="form-group">
+                            <label><i>🏭</i> Manufacturer</label>
+                            <input type="text" name="manufacturer" id="manufacturer" placeholder="Enter manufacturer name">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>📦</i> Batch Number *</label>
+                            <input type="text" name="batch_number" id="batch_number" placeholder="Enter batch number" required>
+                            <div class="error-message" id="error_batch">Batch number is required</div>
+                        </div>
+                        <div class="form-group">
+                            <label><i>🔢</i> Quantity *</label>
+                            <input type="number" name="quantity" id="quantity" placeholder="Enter quantity" min="1" required>
+                            <div class="error-message" id="error_quantity">Valid quantity is required</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>⚠️</i> Minimum Quantity *</label>
+                            <input type="number" name="min_quantity" id="min_quantity" placeholder="Enter minimum quantity" min="1" required>
+                            <div class="error-message" id="error_min_quantity">Minimum quantity is required</div>
+                            <small>Alert when stock falls below this level</small>
+                        </div>
+                        <div class="form-group">
+                            <label><i>💰</i> Unit Price (₹) *</label>
+                            <input type="number" name="unit_price" id="unit_price" step="0.01" min="0" placeholder="Enter price" required>
+                            <div class="error-message" id="error_price">Valid price is required</div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>📅</i> Expiry Date *</label>
+                            <input type="date" name="expiry_date" id="expiry_date"  min="{{ today }}" required>
+                            <div class="error-message" id="error_expiry">Expiry date is required</div>
+                        </div>
+                        <div class="form-group">
+                            <label><i>📅</i> Manufacturing Date</label>
+                            <input type="date" name="manufacturing_date" id="manufacturing_date" max="{{ today }}">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>📍</i> Location/Rack No.</label>
+                            <input type="text" name="location" id="location" placeholder="Enter storage location">
+                            <small>e.g., Rack A-12, Shelf 3</small>
+                        </div>
+                        <div class="form-group">
+                            <label><i>🚚</i> Supplier</label>
+                            <input type="text" name="supplier" id="supplier" placeholder="Enter supplier name">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label><i>📝</i> Description</label>
+                            <textarea name="description" id="description" placeholder="Enter medicine description (optional)" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn-submit" id="submitBtn">
+                            <span id="btnText">Add Medicine</span>
+                            <span id="btnLoader" class="loader" style="display: none;"></span>
+                        </button>
+                        <a href="{% url 'medicine_stock' %}" class="btn-cancel">
+                            <span>❌</span> Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <a href="{% url 'add_medicine' %}" class="action-btn" title="Add New Medicine">➕</a>
+    </div>
+
+    <script>
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDateTime').innerHTML = '📅 ' + now.toLocaleString('en-IN', options);
+        }
+        
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Get form elements
+        const form = document.getElementById('addMedicineForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        const btnLoader = document.getElementById('btnLoader');
+
+        // Validation function
+        function validateField(input, errorId, condition) {
+            const errorDiv = document.getElementById(errorId);
+            if (!condition) {
+                input.classList.add('error');
+                errorDiv.classList.add('show');
+                return false;
+            } else {
+                input.classList.remove('error');
+                errorDiv.classList.remove('show');
+                return true;
+            }
+        }
+
+        // Set minimum date for expiry (today)
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('expiry_date').min = today;
+        document.getElementById('manufacturing_date').max = today;
+
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get values
+            const name = document.getElementById('name').value.trim();
+            const code = document.getElementById('medicine_code').value.trim();
+            const category = document.getElementById('category').value;
+            const batch = document.getElementById('batch_number').value.trim();
+            const quantity = document.getElementById('quantity').value;
+            const minQuantity = document.getElementById('min_quantity').value;
+            const price = document.getElementById('unit_price').value;
+            const expiry = document.getElementById('expiry_date').value;
+            
+            // Validate all fields
+            let isValid = true;
+            
+            isValid &= validateField(document.getElementById('name'), 'error_name', name.length > 0);
+            isValid &= validateField(document.getElementById('medicine_code'), 'error_code', code.length > 0);
+            isValid &= validateField(document.getElementById('category'), 'error_category', category !== '');
+            isValid &= validateField(document.getElementById('batch_number'), 'error_batch', batch.length > 0);
+            isValid &= validateField(document.getElementById('quantity'), 'error_quantity', quantity > 0);
+            isValid &= validateField(document.getElementById('min_quantity'), 'error_min_quantity', minQuantity > 0);
+            isValid &= validateField(document.getElementById('unit_price'), 'error_price', price > 0);
+            isValid &= validateField(document.getElementById('expiry_date'), 'error_expiry', expiry !== '');
+            
+            // Check if expiry date is valid (not in past)
+            if (expiry && expiry < today) {
+                validateField(document.getElementById('expiry_date'), 'error_expiry', false);
+                document.getElementById('error_expiry').textContent = 'Expiry date cannot be in the past';
+                isValid = false;
+            }
+            
+            if (isValid) {
+                // Show loading animation
+                btnText.textContent = 'Adding Medicine...';
+                btnLoader.style.display = 'inline-block';
+                submitBtn.disabled = true;
+                
+                // Submit the form
+                this.submit();
+            } else {
+                // Scroll to first error
+                const firstError = document.querySelector('.error');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+
+        // Add animation to form groups on focus
+        document.querySelectorAll('.form-group input, .form-group select, .form-group textarea').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateX(5px)';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateX(0)';
+            });
+        });
+
+        // Real-time validation
+        document.getElementById('name').addEventListener('input', function() {
+            validateField(this, 'error_name', this.value.trim().length > 0);
+        });
+
+        document.getElementById('medicine_code').addEventListener('input', function() {
+            validateField(this, 'error_code', this.value.trim().length > 0);
+        });
+
+        document.getElementById('category').addEventListener('change', function() {
+            validateField(this, 'error_category', this.value !== '');
+        });
+
+        document.getElementById('batch_number').addEventListener('input', function() {
+            validateField(this, 'error_batch', this.value.trim().length > 0);
+        });
+
+        document.getElementById('quantity').addEventListener('input', function() {
+            validateField(this, 'error_quantity', this.value > 0);
+        });
+
+        document.getElementById('min_quantity').addEventListener('input', function() {
+            validateField(this, 'error_min_quantity', this.value > 0);
+        });
+
+        document.getElementById('unit_price').addEventListener('input', function() {
+            validateField(this, 'error_price', this.value > 0);
+        });
+
+        document.getElementById('expiry_date').addEventListener('change', function() {
+            const isValid = this.value !== '' && this.value >= today;
+            validateField(this, 'error_expiry', isValid);
+            if (!isValid && this.value !== '') {
+                document.getElementById('error_expiry').textContent = 'Expiry date cannot be in the past';
+            } else {
+                document.getElementById('error_expiry').textContent = 'Expiry date is required';
+            }
+        });
+
+        // Prevent negative values in number inputs
+        document.querySelectorAll('input[type="number"]').forEach(input => {
+            input.addEventListener('keydown', function(e) {
+                if (e.key === '-' || e.key === 'e') {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        console.log('Add Medicine page loaded successfully');
+    </script>
+</body>
+</html>

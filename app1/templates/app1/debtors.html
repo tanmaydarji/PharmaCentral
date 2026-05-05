@@ -1,0 +1,962 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCentral - Debtors</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f4f7fc;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-area h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo-area p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .pharmacy-info {
+            text-align: right;
+        }
+
+        .pharmacy-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .pharmacy-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding: 30px 0;
+            animation: slideLeft 0.5s ease;
+        }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .profile-card {
+            text-align: center;
+            padding: 0 20px 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .profile-img {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 32px;
+        }
+
+        .profile-card h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .profile-card p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            color: #667eea;
+            padding-left: 35px;
+            border-left-color: #667eea;
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left-color: white;
+        }
+
+        .menu-item span {
+            font-size: 18px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            animation: slideRight 0.5s ease;
+        }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Message display for Django messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideInMessage 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        @keyframes slideInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #ff4444;
+            border-left: 4px solid #ff4444;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            color: #00cc66;
+            border-left: 4px solid #00cc66;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #2196f3;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #856404;
+        }
+        
+        .close-alert {
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .close-alert:hover {
+            opacity: 1;
+        }
+
+        .debtor-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .page-header h2 {
+            color: #333;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .debtor-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .summary-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(102,126,234,0.3);
+        }
+
+        .summary-box h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .summary-box .amount {
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-input {
+            padding: 10px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .filter-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .filter-btn {
+            padding: 10px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102,126,234,0.3);
+        }
+
+        .debtor-list {
+            margin-top: 20px;
+        }
+
+        .debtor-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .debtor-item:hover {
+            background: #f8f9fa;
+            transform: translateX(5px);
+            border-radius: 10px;
+        }
+
+        .debtor-info {
+            flex: 2;
+            min-width: 250px;
+        }
+
+        .debtor-info h4 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .debtor-info p {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 3px;
+        }
+
+        .debtor-info .customer-type {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 11px;
+            font-weight: 600;
+            margin-top: 5px;
+        }
+
+        .type-debtor {
+            background: #fee;
+            color: #ff4444;
+        }
+
+        .debtor-amount {
+            flex: 1;
+            min-width: 150px;
+            text-align: right;
+        }
+
+        .debtor-amount .amount-due {
+            font-size: 20px;
+            font-weight: 700;
+            color: #ff4444;
+            margin-bottom: 5px;
+        }
+
+        .debtor-amount .due-date {
+            color: #856404;
+            font-size: 13px;
+            background: #fff3cd;
+            padding: 3px 10px;
+            border-radius: 15px;
+            display: inline-block;
+        }
+
+        .debtor-amount .overdue {
+            background: #fee;
+            color: #ff4444;
+        }
+
+        .debtor-actions {
+            display: flex;
+            gap: 10px;
+            min-width: 120px;
+            justify-content: flex-end;
+        }
+
+        .pay-btn {
+            padding: 8px 20px;
+            background: #00cc66;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .pay-btn:hover {
+            background: #00b359;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,204,102,0.3);
+        }
+
+        .view-btn {
+            padding: 8px 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .view-btn:hover {
+            background: #5a6fd6;
+            transform: translateY(-2px);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 50px;
+            color: #999;
+            font-style: italic;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .pagination a, .pagination span {
+            padding: 8px 15px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #666;
+            transition: all 0.3s ease;
+        }
+
+        .pagination a:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .pagination .active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .quick-actions {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .action-btn.quick {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+            animation: pulse 2s infinite;
+            text-decoration: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102,126,234,0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(102,126,234,0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(102,126,234,0);
+            }
+        }
+
+        .action-btn.quick:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        .toast-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            z-index: 9999;
+            animation: slideInRight 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .toast-success {
+            background: #00cc66;
+        }
+
+        .toast-error {
+            background: #ff4444;
+        }
+
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .debtor-summary {
+                grid-template-columns: 1fr;
+            }
+            
+            .debtor-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .debtor-amount {
+                text-align: left;
+                width: 100%;
+            }
+            
+            .debtor-actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-area">
+            <h1>PharmaCentral</h1>
+            <p>Debtor Management</p>
+        </div>
+        <div class="pharmacy-info">
+            <h3>🏥 {{ pharmacy_name }}</h3>
+            <p id="currentDateTime">📅 Loading...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="profile-card">
+                <div class="profile-img">{{ user_initials }}</div>
+                <h3>{{ user_full_name }}</h3>
+                <p>{{ user_role }}</p>
+            </div>
+
+            <div class="menu">
+                <a href="{% url 'dashboard' %}" class="menu-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="{% url 'medicine_stock' %}" class="menu-item">
+                    <span>💊</span> Medicine Stock
+                </a>
+                <a href="{% url 'add_medicine' %}" class="menu-item">
+                    <span>➕</span> Add Medicine
+                </a>
+                <a href="{% url 'sales' %}" class="menu-item">
+                    <span>💰</span> New Sale
+                </a>
+                <a href="{% url 'sales_history' %}" class="menu-item">
+                    <span>📋</span> Sales History
+                </a>
+                <a href="{% url 'customers' %}" class="menu-item">
+                    <span>👥</span> Customers
+                </a>
+                <a href="{% url 'medicine_requests' %}" class="menu-item">📦 Medicine Requests</a>
+                <a href="{% url 'debtors' %}" class="menu-item active">
+                    <span>📝</span> Debtors
+                </a>
+                <a href="{% url 'reports' %}" class="menu-item">
+                    <span>📈</span> Reports
+                </a>
+                <a href="{% url 'settings' %}" class="menu-item">
+                    <span>⚙️</span> Settings
+                </a>
+                <a href="{% url 'logout' %}" class="menu-item" onclick="return confirm('Are you sure you want to logout?')">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Django Messages Display (will be hidden, we use toast instead) -->
+            <div style="display: none;">{% if messages %}{% for message in messages %}{% endfor %}{% endif %}</div>
+
+            <div class="debtor-card">
+                <div class="page-header">
+                    <h2>
+                        <span>📝</span> Debtors Management
+                    </h2>
+                </div>
+
+                <!-- Real Summary Stats -->
+                <div class="debtor-summary">
+                    <div class="summary-box">
+                        <h3>Total Debtors</h3>
+                        <div class="amount" id="totalDebtors">{{ total_debtors }}</div>
+                    </div>
+                    <div class="summary-box">
+                        <h3>Total Amount Due</h3>
+                        <div class="amount" id="totalDue">₹{{ total_due|floatformat:2 }}</div>
+                    </div>
+                    <div class="summary-box">
+                        <h3>Overdue Amount</h3>
+                        <div class="amount" id="overdueAmount">₹{{ overdue_amount|floatformat:2 }}</div>
+                    </div>
+                </div>
+
+                <!-- Search Filter -->
+                <div class="filters">
+                    <form method="GET" action="{% url 'debtors' %}" style="display: flex; gap: 15px; width: 100%; flex-wrap: wrap;" id="searchForm">
+                        <input type="text" name="search" class="filter-input" placeholder="Search debtor by name or phone..." value="{{ search_query }}" id="searchInput">
+                        <button type="submit" class="filter-btn">🔍 Search</button>
+                        {% if search_query %}
+                        <a href="{% url 'debtors' %}" class="filter-btn" style="background: #f0f0f0; color: #666;">Clear</a>
+                        {% endif %}
+                    </form>
+                </div>
+
+                <h3 style="margin-bottom: 20px; display: flex; align-items: center; gap: 10px;">
+                    <span>📋</span> Debtors List
+                    <span style="font-size: 14px; color: #666; font-weight: normal;" id="debtorCount">({{ total_debtors }} debtors)</span>
+                </h3>
+
+                <div class="debtor-list" id="debtorList">
+                    {% for debtor in debtors %}
+                    <div class="debtor-item" id="debtor-{{ debtor.id }}">
+                        <div class="debtor-info">
+                            <h4>{{ debtor.name }}</h4>
+                            <p>📞 {{ debtor.phone|default:"—" }}</p>
+                            <p>Last Purchase: {{ debtor.last_purchase|date:"d M Y"|default:"—" }}</p>
+                            <span class="customer-type type-debtor">Debtor</span>
+                        </div>
+                        <div class="debtor-amount">
+                            <div class="amount-due" id="due-{{ debtor.id }}">₹{{ debtor.due_amount|floatformat:2 }}</div>
+                            {% if debtor.days_overdue > 0 %}
+                                <div class="due-date overdue" id="date-{{ debtor.id }}">
+                                    Overdue by {{ debtor.days_overdue }} days
+                                </div>
+                            {% else %}
+                                <div class="due-date" id="date-{{ debtor.id }}">
+                                    Due in {{ debtor.days_until_due }} days
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="debtor-actions">
+                            <a href="{% url 'view_customer' debtor.id %}" class="view-btn">
+                                <span>👁️</span> View
+                            </a>
+                            <button class="pay-btn" onclick="processPayment('{{ debtor.id }}', '{{ debtor.name|escapejs }}', {{ debtor.due_amount }})">
+                                Received
+                            </button>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="no-data" id="noData">
+                        <div style="font-size: 48px; margin-bottom: 20px;">🎉</div>
+                        <h3 style="color: #333; margin-bottom: 10px;">No Debtors Found</h3>
+                        <p style="color: #666;">All customers have cleared their dues!</p>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <!-- Pagination -->
+                {% if debtors.has_other_pages %}
+                <div class="pagination" id="pagination">
+                    {% if debtors.has_previous %}
+                        <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}">«</a>
+                        <a href="?page={{ debtors.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">‹</a>
+                    {% endif %}
+
+                    {% for i in debtors.paginator.page_range %}
+                        {% if debtors.number == i %}
+                            <span class="active">{{ i }}</span>
+                        {% elif i > debtors.number|add:'-3' and i < debtors.number|add:'3' %}
+                            <a href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}">{{ i }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if debtors.has_next %}
+                        <a href="?page={{ debtors.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}">›</a>
+                        <a href="?page={{ debtors.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}">»</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal -->
+    <div id="paymentModal" class="modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: white; width: 90%; max-width: 400px; padding: 30px; border-radius: 15px; text-align: center;">
+            <div style="font-size: 50px; margin-bottom: 15px;">💰</div>
+            <h3 style="color: #333; margin-bottom: 10px;">Receive Payment</h3>
+            <p style="color: #666; margin-bottom: 20px;" id="paymentMessage">Enter payment amount for <span id="debtorName"></span></p>
+            
+            <form id="paymentForm" onsubmit="submitPayment(event)">
+                {% csrf_token %}
+                <input type="hidden" id="debtorId" name="debtor_id">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; text-align: left; margin-bottom: 5px; color: #666;">Amount (₹)</label>
+                    <input type="number" id="paymentAmount" name="amount" step="0.01" min="0.01" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;" required>
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; text-align: left; margin-bottom: 5px; color: #666;">Payment Method</label>
+                    <select name="payment_method" id="paymentMethod" style="width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 8px;">
+                        <option value="cash">Cash</option>
+                        <option value="card">Card</option>
+                        <option value="upi">UPI</option>
+                        <option value="bank">Bank Transfer</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button type="submit" style="padding: 10px 25px; background: #00cc66; color: white; border: none; border-radius: 8px; cursor: pointer;" id="submitBtn">Process Payment</button>
+                    <button type="button" onclick="closePaymentModal()" style="padding: 10px 25px; background: #f0f0f0; color: #666; border: none; border-radius: 8px; cursor: pointer;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Message Container -->
+    <div id="toastContainer"></div>
+
+    <div class="quick-actions">
+        <a href="{% url 'customers' %}" class="action-btn quick" title="View Customers">👥</a>
+    </div>
+
+    <script>
+        // Get CSRF token
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+        const csrftoken = getCookie('csrftoken');
+
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDateTime').innerHTML = '📅 ' + now.toLocaleString('en-IN', options);
+        }
+        
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Show toast message
+        function showToast(message, type = 'success') {
+            const toast = document.createElement('div');
+            toast.className = `toast-message toast-${type}`;
+            toast.textContent = message;
+            document.getElementById('toastContainer').appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Payment modal functions
+        function processPayment(debtorId, debtorName, totalDue) {
+            document.getElementById('debtorId').value = debtorId;
+            document.getElementById('debtorName').textContent = debtorName;
+            document.getElementById('paymentMessage').innerHTML = `Enter payment amount for <strong>${debtorName}</strong>. Total due: ₹${totalDue.toFixed(2)}`;
+            document.getElementById('paymentModal').style.display = 'flex';
+            
+            // Set max amount
+            const amountInput = document.getElementById('paymentAmount');
+            amountInput.max = totalDue;
+            amountInput.placeholder = `Max: ₹${totalDue.toFixed(2)}`;
+            amountInput.value = totalDue.toFixed(2);
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').style.display = 'none';
+        }
+
+        // Submit payment via AJAX
+        // Submit payment via AJAX
+async function submitPayment(event) {
+    event.preventDefault();
+    
+    const debtorId = document.getElementById('debtorId').value;
+    const amount = document.getElementById('paymentAmount').value;
+    const paymentMethod = document.getElementById('paymentMethod').value;
+    
+    // Disable submit button
+    const submitBtn = document.getElementById('submitBtn');
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Processing...';
+    
+    try {
+        const formData = new FormData();
+        formData.append('amount', amount);
+        formData.append('payment_method', paymentMethod);
+        formData.append('csrfmiddlewaretoken', csrftoken);
+        
+        const response = await fetch(`/receive-payment/${debtorId}/`, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': csrftoken
+            }
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            showToast(data.message, 'success');
+            
+            // Remove debtor from list if fully paid
+            if (data.fully_paid) {
+                const debtorElement = document.getElementById(`debtor-${debtorId}`);
+                if (debtorElement) {
+                    debtorElement.style.transition = 'all 0.3s ease';
+                    debtorElement.style.opacity = '0';
+                    debtorElement.style.transform = 'translateX(20px)';
+                    
+                    setTimeout(() => {
+                        debtorElement.remove();
+                        
+                        // Update counts
+                        const totalDebtors = parseInt(document.getElementById('totalDebtors').textContent) - 1;
+                        document.getElementById('totalDebtors').textContent = totalDebtors;
+                        document.getElementById('debtorCount').textContent = `(${totalDebtors} debtors)`;
+                        
+                        // Update total due
+                        const totalDueElement = document.getElementById('totalDue');
+                        const currentTotal = parseFloat(totalDueElement.textContent.replace('₹', ''));
+                        const newTotal = currentTotal - parseFloat(amount);
+                        totalDueElement.textContent = `₹${newTotal.toFixed(2)}`;
+                        
+                        // Show no data message if no debtors left
+                        if (totalDebtors === 0) {
+                            document.getElementById('debtorList').innerHTML = `
+                                <div class="no-data">
+                                    <div style="font-size: 48px; margin-bottom: 20px;">🎉</div>
+                                    <h3 style="color: #333; margin-bottom: 10px;">No Debtors Found</h3>
+                                    <p style="color: #666;">All customers have cleared their dues!</p>
+                                </div>
+                            `;
+                        }
+                    }, 300);
+                }
+            } else {
+                // Update the due amount for this debtor
+                const dueElement = document.getElementById(`due-${debtorId}`);
+                if (dueElement) {
+                    const newDue = data.new_due;
+                    dueElement.textContent = `₹${newDue.toFixed(2)}`;
+                    
+                    // Highlight the update
+                    dueElement.style.transition = 'all 0.3s ease';
+                    dueElement.style.color = '#00cc66';
+                    dueElement.style.transform = 'scale(1.1)';
+                    
+                    setTimeout(() => {
+                        dueElement.style.color = '#ff4444';
+                        dueElement.style.transform = 'scale(1)';
+                    }, 500);
+                }
+                
+                // Update total due
+                const totalDueElement = document.getElementById('totalDue');
+                const currentTotal = parseFloat(totalDueElement.textContent.replace('₹', ''));
+                const newTotal = currentTotal - parseFloat(amount);
+                totalDueElement.textContent = `₹${newTotal.toFixed(2)}`;
+            }
+            
+            closePaymentModal();
+        } else {
+            showToast(data.error || 'Payment failed!', 'error');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        showToast('Network error! Please try again.', 'error');
+    } finally {
+        // Re-enable submit button
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Process Payment';
+    }
+}
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('paymentModal');
+            if (event.target === modal) {
+                closePaymentModal();
+            }
+        }
+
+        console.log('Debtors page loaded successfully');
+    </script>
+</body>
+</html>

@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCentral - Customers</title>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f4f7fc;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.8s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-area h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .logo-area p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .pharmacy-info {
+            text-align: right;
+        }
+
+        .pharmacy-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .pharmacy-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding: 30px 0;
+            animation: slideLeft 0.8s ease;
+        }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .profile-card {
+            text-align: center;
+            padding: 0 20px 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .profile-img {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 32px;
+        }
+
+        .profile-card h3 {
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .profile-card p {
+            color: #666;
+            font-size: 13px;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            color: #667eea;
+            padding-left: 35px;
+            border-left-color: #667eea;
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left-color: white;
+        }
+
+        .menu-item span {
+            font-size: 18px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            animation: slideRight 0.8s ease;
+        }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Message display for Django messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideInMessage 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        @keyframes slideInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #ff4444;
+            border-left: 4px solid #ff4444;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            color: #00cc66;
+            border-left: 4px solid #00cc66;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #2196f3;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #856404;
+        }
+        
+        .close-alert {
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .close-alert:hover {
+            opacity: 1;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .page-header h2 {
+            color: #333;
+            font-size: 28px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            padding: 12px 20px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            width: 300px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.1);
+        }
+
+        .search-box button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .search-box button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.4);
+        }
+
+        .add-btn {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, #00cc66 0%, #00994d 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,204,102,0.4);
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102,126,234,0.15);
+        }
+
+        .stat-info h3 {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .stat-info .number {
+            color: #333;
+            font-size: 28px;
+            font-weight: 700;
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-tab {
+            padding: 8px 20px;
+            border: 1px solid #e0e0e0;
+            border-radius: 25px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-decoration: none;
+            color: #666;
+        }
+
+        .filter-tab:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .filter-tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .customers-table-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            overflow-x: auto;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1000px;
+        }
+
+        th {
+            text-align: left;
+            padding: 15px 10px;
+            color: #666;
+            font-weight: 600;
+            border-bottom: 2px solid #f0f0f0;
+            background: #f8f9fa;
+        }
+
+        td {
+            padding: 15px 10px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        tr:hover td {
+            background: #f8f9fa;
+        }
+
+        .customer-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .customer-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .customer-details h4 {
+            color: #333;
+            margin-bottom: 3px;
+        }
+
+        .customer-details p {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .customer-type {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .type-regular {
+            background: #e8f5e9;
+            color: #00cc66;
+        }
+
+        .type-vip {
+            background: linear-gradient(135deg, #ffd700 0%, #ffb347 100%);
+            color: white;
+        }
+
+        .type-debtor {
+            background: #fee;
+            color: #ff4444;
+        }
+
+        .type-new {
+            background: #e3f2fd;
+            color: #2196f3;
+        }
+
+        .amount {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .amount.due {
+            color: #ff4444;
+        }
+
+        .badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge.paid {
+            background: #e8f5e9;
+            color: #00cc66;
+        }
+
+        .badge.unpaid {
+            background: #fee;
+            color: #ff4444;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .action-btn.view {
+            background: #667eea;
+            color: white;
+        }
+
+        .action-btn.view:hover {
+            background: #5a6fd6;
+            transform: scale(1.05);
+        }
+
+        .action-btn.history {
+            background: #764ba2;
+            color: white;
+        }
+
+        .action-btn.history:hover {
+            background: #6a4193;
+            transform: scale(1.05);
+        }
+
+        .action-btn.edit {
+            background: #00cc66;
+            color: white;
+        }
+
+        .action-btn.edit:hover {
+            background: #00b359;
+            transform: scale(1.05);
+        }
+
+        .no-data {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-style: italic;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .pagination a, .pagination span {
+            padding: 10px 15px;
+            border: 1px solid #e0e0e0;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #666;
+        }
+
+        .pagination a:hover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-color: transparent;
+        }
+
+        .pagination .active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+        }
+
+        .quick-actions {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .action-btn.quick {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+            animation: pulse 2s infinite;
+            text-decoration: none;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102,126,234,0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(102,126,234,0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(102,126,234,0);
+            }
+        }
+
+        .action-btn.quick:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        @media (max-width: 1024px) {
+            .stats-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .header-actions {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .search-box input {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .stats-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-area">
+            <h1>PharmaCentral</h1>
+            <p>Customer Management</p>
+        </div>
+        <div class="pharmacy-info">
+            <h3>🏥 {{ pharmacy_name }}</h3>
+            <p id="currentDateTime">📅 Loading...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="profile-card">
+                <div class="profile-img">{{ user_initials }}</div>
+                <h3>{{ user_full_name }}</h3>
+                <p>{{ user_role }}</p>
+            </div>
+
+            <div class="menu">
+                <a href="{% url 'dashboard' %}" class="menu-item">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="{% url 'medicine_stock' %}" class="menu-item">
+                    <span>💊</span> Medicine Stock
+                </a>
+                <a href="{% url 'add_medicine' %}" class="menu-item">
+                    <span>➕</span> Add Medicine
+                </a>
+                <a href="{% url 'sales' %}" class="menu-item">
+                    <span>💰</span> New Sale
+                </a>
+                <a href="{% url 'sales_history' %}" class="menu-item">
+                    <span>📋</span> Sales History
+                </a>
+                <a href="{% url 'customers' %}" class="menu-item active">
+                    <span>👥</span> Customers
+                </a>
+                 <a href="{% url 'medicine_requests' %}" class="menu-item">📦 Medicine Requests</a>
+                <a href="{% url 'debtors' %}" class="menu-item">
+                    <span>📝</span> Debtors
+                </a>
+                <a href="{% url 'reports' %}" class="menu-item">
+                    <span>📈</span> Reports
+                </a>
+                <a href="{% url 'settings' %}" class="menu-item">
+                    <span>⚙️</span> Settings
+                </a>
+                <a href="{% url 'logout' %}" class="menu-item" onclick="return confirm('Are you sure you want to logout?')">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Django Messages Display -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <span class="close-alert" onclick="this.parentElement.style.display='none'">×</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="page-header">
+                <h2>
+                    <span>👥</span> Customer Management
+                </h2>
+                <div class="header-actions">
+                    <div class="search-box">
+                        <form method="GET" action="{% url 'customers' %}">
+                            <input type="text" name="search" placeholder="Search customers by name, phone, email..." value="{{ search_query }}">
+                            <button type="submit">🔍 Search</button>
+                        </form>
+                    </div>
+                    <a href="{% url 'add_customer' %}" class="add-btn">
+                        <span>➕</span> Add New Customer
+                    </a>
+                </div>
+            </div>
+
+            <!-- Stats Cards -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Total Customers</h3>
+                        <div class="number">{{ total_customers }}</div>
+                    </div>
+                    <div class="stat-icon">👥</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Active This Month</h3>
+                        <div class="number">{{ active_this_month }}</div>
+                    </div>
+                    <div class="stat-icon">📊</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Debtors</h3>
+                        <div class="number">{{ debtor_count }}</div>
+                    </div>
+                    <div class="stat-icon">📝</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>New This Week</h3>
+                        <div class="number">{{ new_this_week }}</div>
+                    </div>
+                    <div class="stat-icon">🌟</div>
+                </div>
+            </div>
+
+            <!-- Filter Tabs -->
+            <div class="filter-tabs">
+                <a href="{% url 'customers' %}" class="filter-tab {% if not customer_type %}active{% endif %}">All Customers</a>
+                <a href="{% url 'customers' %}?type=regular" class="filter-tab {% if customer_type == 'regular' %}active{% endif %}">Regular</a>
+                <a href="{% url 'customers' %}?type=vip" class="filter-tab {% if customer_type == 'vip' %}active{% endif %}">VIP</a>
+                <a href="{% url 'customers' %}?type=debtor" class="filter-tab {% if customer_type == 'debtor' %}active{% endif %}">Debtors</a>
+                <a href="{% url 'customers' %}?type=new" class="filter-tab {% if customer_type == 'new' %}active{% endif %}">New</a>
+            </div>
+
+            <!-- Customers Table -->
+            <div class="customers-table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Contact</th>
+                            <th>Email</th>
+                            <th>Type</th>
+                            <th>Total Purchases</th>
+                            <th>Last Purchase</th>
+                            <th>Due Amount</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for customer in customers %}
+                        <tr>
+                            <td>
+                                <div class="customer-info">
+                                    <div class="customer-avatar">{{ customer.initials }}</div>
+                                    <div class="customer-details">
+                                        <h4>{{ customer.full_name }}</h4>
+                                        <p>Customer since: {{ customer.created_at|date:"M Y" }}</p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ customer.phone }}</td>
+                            <td>{{ customer.email|default:"—" }}</td>
+                            <td>
+                                <span class="customer-type 
+                                    {% if customer.customer_type == 'regular' %}type-regular
+                                    {% elif customer.customer_type == 'vip' %}type-vip
+                                    {% elif customer.customer_type == 'debtor' %}type-debtor
+                                    {% elif customer.customer_type == 'new' %}type-new
+                                    {% endif %}">
+                                    {{ customer.get_customer_type_display }}
+                                </span>
+                            </td>
+                            <td class="amount">₹{{ customer.total_purchases|floatformat:2 }}</td>
+                            <td>{{ customer.last_purchase_date|date:"d M Y"|default:"—" }}</td>
+                            <td class="amount due">{% if customer.due_amount > 0 %}₹{{ customer.due_amount }}{% else %}₹0{% endif %}</td>
+                            <td>
+                                <span class="badge {% if customer.due_amount > 0 %}unpaid{% else %}paid{% endif %}">
+                                    {% if customer.due_amount > 0 %}Due{% else %}Paid{% endif %}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{% url 'view_customer' customer.id %}" class="action-btn view">View</a>
+                                    <a href="{% url 'customer_history' customer.id %}" class="action-btn history">History</a>
+                                    <a href="{% url 'edit_customer' customer.id %}" class="action-btn edit">Edit</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="9" class="no-data">
+                                <div style="text-align: center; padding: 40px;">
+                                    <div style="font-size: 48px; margin-bottom: 20px;">👥</div>
+                                    <h3 style="color: #333; margin-bottom: 10px;">No Customers Found</h3>
+                                    <p style="color: #666; margin-bottom: 20px;">{% if search_query %}No customers matching "{{ search_query }}"{% else %}Add your first customer to get started{% endif %}</p>
+                                    <a href="{% url 'add_customer' %}" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 12px 30px; border-radius: 10px; text-decoration: none; display: inline-block;">➕ Add New Customer</a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                {% if customers.has_other_pages %}
+                <div class="pagination">
+                    {% if customers.has_previous %}
+                        <a href="?page=1{% if search_query %}&search={{ search_query }}{% endif %}{% if customer_type %}&type={{ customer_type }}{% endif %}">«</a>
+                        <a href="?page={{ customers.previous_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if customer_type %}&type={{ customer_type }}{% endif %}">‹</a>
+                    {% endif %}
+
+                    {% for i in customers.paginator.page_range %}
+                        {% if customers.number == i %}
+                            <span class="active">{{ i }}</span>
+                        {% elif i > customers.number|add:'-3' and i < customers.number|add:'3' %}
+                            <a href="?page={{ i }}{% if search_query %}&search={{ search_query }}{% endif %}{% if customer_type %}&type={{ customer_type }}{% endif %}">{{ i }}</a>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if customers.has_next %}
+                        <a href="?page={{ customers.next_page_number }}{% if search_query %}&search={{ search_query }}{% endif %}{% if customer_type %}&type={{ customer_type }}{% endif %}">›</a>
+                        <a href="?page={{ customers.paginator.num_pages }}{% if search_query %}&search={{ search_query }}{% endif %}{% if customer_type %}&type={{ customer_type }}{% endif %}">»</a>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="quick-actions">
+        <a href="{% url 'add_customer' %}" class="action-btn quick" title="Add New Customer">➕</a>
+    </div>
+
+    <script>
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDateTime').innerHTML = '📅 ' + now.toLocaleString('en-IN', options);
+        }
+        
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+
+        console.log('Customers page loaded successfully');
+    </script>
+</body>
+</html>

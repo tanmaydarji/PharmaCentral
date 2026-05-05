@@ -1,0 +1,18 @@
+{
+  "timestamp": "20260227_140046",
+  "date": "2026-02-27 14:00:46",
+  "user": {
+    "email": "p@gmail.com",
+    "username": "p@gmail.com",
+    "id": 5
+  },
+  "pharmacy": "Unknown",
+  "size": 323584,
+  "size_kb": "316.00 KB",
+  "tables": [
+    "medicines",
+    "customers",
+    "sales",
+    "pharmacy"
+  ]
+}

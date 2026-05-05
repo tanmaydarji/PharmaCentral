@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="gu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PharmaCentral - Dashboard</title>
+    
+    <!-- Django CSRF Token -->
+    {% csrf_token %}
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: #f4f7fc;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px 30px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .logo-area h1 {
+            font-size: 28px;
+        }
+
+        .pharmacy-info {
+            text-align: right;
+        }
+
+        .pharmacy-info h3 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .pharmacy-info p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: white;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            padding: 30px 0;
+            animation: slideLeft 0.5s ease;
+        }
+
+        @keyframes slideLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .profile-card {
+            text-align: center;
+            padding: 0 20px 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .profile-img {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 15px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 40px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .profile-img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.3);
+        }
+
+        .profile-card h3 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 18px;
+        }
+
+        .profile-card p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .menu-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: #666;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border-left: 4px solid transparent;
+        }
+
+        .menu-item:hover {
+            background: linear-gradient(135deg, #667eea10 0%, #764ba210 100%);
+            color: #667eea;
+            padding-left: 35px;
+            border-left-color: #667eea;
+        }
+
+        .menu-item.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-left-color: white;
+        }
+
+        .menu-item span {
+            font-size: 20px;
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            animation: slideRight 0.5s ease;
+        }
+
+        @keyframes slideRight {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(102,126,234,0.15);
+        }
+
+        .stat-info h3 {
+            color: #666;
+            font-size: 15px;
+            margin-bottom: 10px;
+        }
+
+        .stat-info .number {
+            color: #333;
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 28px;
+        }
+
+        .alerts-section {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .alert-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            animation: fadeInUp 0.5s ease 0.2s both;
+        }
+
+        .alert-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(102,126,234,0.15);
+        }
+
+        .alert-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .alert-header h3 {
+            color: #333;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .expiry-list, .quantity-list {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .expiry-list::-webkit-scrollbar,
+        .quantity-list::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .expiry-list::-webkit-scrollbar-thumb,
+        .quantity-list::-webkit-scrollbar-thumb {
+            background: #667eea;
+            border-radius: 5px;
+        }
+
+        .expiry-item, .quantity-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            transition: all 0.3s ease;
+        }
+
+        .expiry-item:hover, .quantity-item:hover {
+            background: #f8f9fa;
+            padding-left: 10px;
+            border-radius: 8px;
+        }
+
+        .expiry-item h4, .quantity-item h4 {
+            color: #333;
+            font-size: 14px;
+            margin-bottom: 3px;
+        }
+
+        .expiry-item p, .quantity-item p {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .expiry-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .expiry-badge.danger {
+            background: #fee;
+            color: #ff4444;
+        }
+
+        .expiry-badge.warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .expiry-badge.success {
+            background: #e8f5e9;
+            color: #00cc66;
+        }
+
+        .quantity-badge {
+            background: #fee;
+            color: #ff4444;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .view-all-link {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .view-all-link:hover {
+            color: #764ba2;
+            text-decoration: underline;
+        }
+
+        .recent-activities {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            animation: fadeInUp 0.5s ease 0.4s both;
+        }
+
+        .recent-activities h3 {
+            color: #333;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-item:hover {
+            background: #f8f9fa;
+            transform: translateX(10px);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 18px;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-content p {
+            color: #333;
+            margin-bottom: 3px;
+            font-weight: 500;
+        }
+
+        .activity-content small {
+            color: #999;
+            font-size: 12px;
+        }
+
+        .empty-message {
+            text-align: center;
+            color: #999;
+            padding: 20px;
+            font-style: italic;
+        }
+
+        .quick-actions {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 100;
+        }
+
+        .action-btn {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(102,126,234,0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(102,126,234,0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(102,126,234,0);
+            }
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1) rotate(90deg);
+        }
+
+        /* Message display for Django messages */
+        .messages {
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            animation: slideInMessage 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        @keyframes slideInMessage {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .alert-error {
+            background: #fee;
+            color: #ff4444;
+            border-left: 4px solid #ff4444;
+        }
+        
+        .alert-success {
+            background: #e8f5e9;
+            color: #00cc66;
+            border-left: 4px solid #00cc66;
+        }
+        
+        .alert-info {
+            background: #e3f2fd;
+            color: #2196f3;
+            border-left: 4px solid #2196f3;
+        }
+        
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #856404;
+        }
+        
+        .close-alert {
+            cursor: pointer;
+            font-size: 18px;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+        
+        .close-alert:hover {
+            opacity: 1;
+        }
+
+        /* Badge styles */
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .badge-danger {
+            background: #ff4444;
+            color: white;
+        }
+        
+        .badge-warning {
+            background: #ffbb33;
+            color: white;
+        }
+        
+        .badge-success {
+            background: #00C851;
+            color: white;
+        }
+
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .alerts-section {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-area">
+            <h1>PharmaCentral</h1>
+            <p>Pharmacy Management System</p>
+        </div>
+        <div class="pharmacy-info">
+            <h3>🏥 {{ pharmacy_name }}</h3>
+            <p id="currentDateTime">📅 Loading...</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <div class="profile-card">
+                <div class="profile-img">{{ user_initials }}</div>
+                <h3>{{ user_full_name }}</h3>
+                <p>{{ user_role }}</p>
+            </div>
+
+            <div class="menu">
+                <a href="{% url 'dashboard' %}" class="menu-item active">
+                    <span>📊</span> Dashboard
+                </a>
+                <a href="{% url 'medicine_stock' %}" class="menu-item">
+                    <span>💊</span> Medicine Stock
+                </a>
+                <a href="{% url 'add_medicine' %}" class="menu-item">
+                    <span>➕</span> Add Medicine
+                </a>
+                <a href="{% url 'sales' %}" class="menu-item">
+                    <span>💰</span> New Sale
+                </a>
+                <a href="{% url 'sales_history' %}" class="menu-item">
+                    <span>📋</span> Sales History
+                </a>
+                <a href="{% url 'customers' %}" class="menu-item">
+                    <span>👥</span> Customers
+                </a>
+                <a href="{% url 'medicine_requests' %}" class="menu-item">📦 Medicine Requests</a>
+                <a href="{% url 'debtors' %}" class="menu-item">
+                    <span>📝</span> Debtors
+                </a>
+                <a href="{% url 'reports' %}" class="menu-item">
+                    <span>📈</span> Reports
+                </a>
+                <a href="{% url 'settings' %}" class="menu-item">
+                    <span>⚙️</span> Settings
+                </a>
+                <a href="{% url 'logout' %}" class="menu-item" onclick="return confirm('Are you sure you want to logout?')">
+                    <span>🚪</span> Logout
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- Django Messages Display -->
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <span class="close-alert" onclick="this.parentElement.style.display='none'">×</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <!-- Stats Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Total Medicines</h3>
+                        <div class="number">{{ total_medicines }}</div>
+                    </div>
+                    <div class="stat-icon">💊</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Low Stock</h3>
+                        <div class="number">{{ low_stock }}</div>
+                    </div>
+                    <div class="stat-icon">⚠️</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Expiring Soon</h3>
+                        <div class="number">{{ expiring_soon }}</div>
+                    </div>
+                    <div class="stat-icon">⏰</div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-info">
+                        <h3>Today's Sales</h3>
+                        <div class="number">₹{{ today_sales|floatformat:2 }}</div>
+                    </div>
+                    <div class="stat-icon">💰</div>
+                </div>
+            </div>
+
+            <!-- Alerts Section -->
+            <div class="alerts-section">
+                <!-- Expiry Alerts Card -->
+                <div class="alert-card">
+                    <div class="alert-header">
+                        <h3>
+                            <span>⚠️</span> Expiry Alerts
+                            {% if expiry_alerts_count > 0 %}
+                            <span class="badge badge-danger">{{ expiry_alerts_count }}</span>
+                            {% endif %}
+                        </h3>
+                        <a href="{% url 'medicine_stock' %}?status=expiring" class="view-all-link">View All →</a>
+                    </div>
+                    <div class="expiry-list">
+                        {% if expiry_alerts %}
+                            {% for alert in expiry_alerts %}
+                            <div class="expiry-item">
+                                <div>
+                                    <h4>{{ alert.name }}</h4>
+                                    <p>Batch: {{ alert.batch_number }}</p>
+                                </div>
+                                <div class="expiry-badge {{ alert.status }}">
+                                    {{ alert.days_until_expiry }} days left
+                                </div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-message">
+                                No medicines expiring soon
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Low Stock Alerts Card -->
+                <div class="alert-card">
+                    <div class="alert-header">
+                        <h3>
+                            <span>📉</span> Low Stock Alerts
+                            {% if low_stock_alerts_count > 0 %}
+                            <span class="badge badge-danger">{{ low_stock_alerts_count }}</span>
+                            {% endif %}
+                        </h3>
+                        <a href="{% url 'medicine_stock' %}?status=low_stock" class="view-all-link">View All →</a>
+                    </div>
+                    <div class="quantity-list">
+                        {% if low_stock_alerts %}
+                            {% for alert in low_stock_alerts %}
+                            <div class="quantity-item">
+                                <div>
+                                    <h4>{{ alert.name }}</h4>
+                                    <p>Stock: {{ alert.quantity }} | Min: {{ alert.min_quantity }}</p>
+                                </div>
+                                <div class="quantity-badge">Reorder</div>
+                            </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="empty-message">
+                                All medicines have sufficient stock
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="recent-activities">
+                <h3>
+                    <span>📋</span> Recent Activities
+                    {% if recent_activities_count > 0 %}
+                    <span class="badge badge-success" style="margin-left: auto;">{{ recent_activities_count }} activities</span>
+                    {% endif %}
+                </h3>
+                <div class="activity-list">
+                    {% if recent_activities %}
+                        {% for activity in recent_activities %}
+                        <div class="activity-item">
+                            <div class="activity-icon">
+                                {% if activity.action_type == 'sale' %}💰
+                                {% elif activity.action_type == 'payment' %}💵
+                                {% elif activity.action_type == 'stock_add' %}➕
+                                {% elif activity.action_type == 'medicine_add' %}💊
+                                {% elif activity.action_type == 'customer_add' %}👤
+                                {% elif activity.action_type == 'login' %}🔑
+                                {% elif activity.action_type == 'logout' %}🚪
+                                {% else %}📝{% endif %}
+                            </div>
+                            <div class="activity-content">
+                                <p>{{ activity.description }}</p>
+                                <small>{{ activity.timestamp|timesince }} ago</small>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="empty-message">
+                            No recent activities
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <a href="{% url 'add_medicine' %}" class="action-btn" title="Add New Medicine">➕</a>
+    </div>
+
+    <script>
+        // Update date and time
+        function updateDateTime() {
+            const now = new Date();
+            const options = { 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit', 
+                minute: '2-digit',
+                second: '2-digit'
+            };
+            document.getElementById('currentDateTime').innerHTML = '📅 ' + now.toLocaleString('en-IN', options);
+        }
+        
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
+        // Auto-hide messages after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 500);
+            });
+        }, 5000);
+
+        // Add animation to stat cards on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver(function(entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.5s ease forwards';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stat-card, .alert-card, .recent-activities').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Confirm logout
+        document.querySelectorAll('a[href*="logout"]').forEach(link => {
+            link.addEventListener('click', function(e) {
+                if (!confirm('Are you sure you want to logout?')) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        // Add tooltips to menu items
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                const text = this.textContent.trim();
+                if (text.length > 20) {
+                    this.setAttribute('title', text);
+                }
+            });
+        });
+
+        console.log('Dashboard loaded successfully');
+    </script>
+</body>
+</html>
